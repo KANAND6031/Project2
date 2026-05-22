@@ -2,10 +2,18 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
+const connectDB = require("./config/db");
+
+const testRoutes = require("./routes/testRoutes");
+
 const app = express();
+
+connectDB();
 
 app.use(cors());
 app.use(express.json());
+
+app.use("/api", testRoutes);
 
 app.get("/", (req, res) => {
     res.send("OpsMind AI Backend Running");
