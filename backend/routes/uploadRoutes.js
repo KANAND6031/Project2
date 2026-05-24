@@ -5,13 +5,15 @@ const path = require("path");
 const router = express.Router();
 
 
-// Storage Configuration
+// Storage
 const storage = multer.diskStorage({
+
     destination: function (req, file, cb) {
         cb(null, "uploads/");
     },
 
     filename: function (req, file, cb) {
+
         const uniqueName =
             Date.now() + path.extname(file.originalname);
 
@@ -20,13 +22,13 @@ const storage = multer.diskStorage({
 });
 
 
-// File Filter
+// PDF Filter
 const fileFilter = (req, file, cb) => {
 
     if (file.mimetype === "application/pdf") {
         cb(null, true);
     } else {
-        cb(new Error("Only PDF files allowed"), false);
+        cb(new Error("Only PDF allowed"), false);
     }
 };
 
@@ -37,21 +39,24 @@ const upload = multer({
 });
 
 
-// Upload Route
+// Upload API
 router.post(
     "/upload",
     upload.single("pdf"),
-    (req, res) => {
+    async (req, res) => {
 
         try {
+
+            console.log(req.file);
 
             res.status(200).json({
                 success: true,
                 message: "PDF uploaded successfully",
-                file: req.file,
             });
 
         } catch (error) {
+
+            console.log(error);
 
             res.status(500).json({
                 success: false,
