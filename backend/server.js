@@ -11,9 +11,16 @@ const app = express();
 
 connectDB();
 
+
+// VERY IMPORTANT CORS FIX
 app.use(cors({
-    origin: "*",
+    origin: [
+        "https://friendly-fortnight-4j69wqgx7ggphqqp4-5173.app.github.dev"
+    ],
+    methods: ["GET", "POST"],
+    credentials: true,
 }));
+
 
 app.use(express.json());
 
