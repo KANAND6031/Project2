@@ -1,5 +1,5 @@
 const fs = require("fs");
-const pdfParse = require("pdf-parse/lib/pdf-parse.js");
+const pdfParse = require("pdf-parse");
 
 const extractPDFText = async (filePath) => {
 
