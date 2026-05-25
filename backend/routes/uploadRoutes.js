@@ -2,10 +2,12 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 
+const extractPDFText = require("../services/pdfService");
+
 const router = express.Router();
 
 
-// Storage
+// Storage Config
 const storage = multer.diskStorage({
 
     destination: function (req, file, cb) {
@@ -28,7 +30,7 @@ const fileFilter = (req, file, cb) => {
     if (file.mimetype === "application/pdf") {
         cb(null, true);
     } else {
-        cb(new Error("Only PDF allowed"), false);
+        cb(new Error("Only PDF files allowed"), false);
     }
 };
 
@@ -39,7 +41,7 @@ const upload = multer({
 });
 
 
-// Upload API
+// Upload + Parse Route
 router.post(
     "/upload",
     upload.single("pdf"),
@@ -47,11 +49,28 @@ router.post(
 
         try {
 
-            console.log(req.file);
+            // Uploaded file path
+            const filePath = req.file.path;
+
+            // Extract text
+            const pdfData =
+                await extractPDFText(filePath);
+
+            console.log(pdfData.text);
 
             res.status(200).json({
+
                 success: true,
-                message: "PDF uploaded successfully",
+
+                message:
+                    "PDF uploaded and parsed successfully",
+
+                fileName: req.file.filename,
+
+                pages: pdfData.pages,
+
+                extractedText:
+                    pdfData.text.substring(0, 1000),
             });
 
         } catch (error) {
@@ -60,7 +79,7 @@ router.post(
 
             res.status(500).json({
                 success: false,
-                message: "Upload failed",
+                message: "PDF Parsing Failed",
             });
         }
     }

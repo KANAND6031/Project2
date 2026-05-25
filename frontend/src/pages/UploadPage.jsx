@@ -12,6 +12,10 @@ const UploadPage = () => {
 
     const [progress, setProgress] = useState(0);
 
+    const [text, setText] = useState("");
+
+    const [pages, setPages] = useState(0);
+
 
     const handleUpload = async () => {
 
@@ -35,23 +39,33 @@ const UploadPage = () => {
                 formData,
                 {
                     headers: {
-                        "Content-Type": "multipart/form-data",
+                        "Content-Type":
+                            "multipart/form-data",
                     },
 
-                    onUploadProgress: (progressEvent) => {
+                    onUploadProgress:
+                        (progressEvent) => {
 
-                        const percent =
-                            Math.round(
-                                (progressEvent.loaded * 100) /
-                                progressEvent.total
-                            );
+                            const percent =
+                                Math.round(
+                                    (
+                                        progressEvent.loaded
+                                        * 100
+                                    )
+                                    /
+                                    progressEvent.total
+                                );
 
-                        setProgress(percent);
-                    },
+                            setProgress(percent);
+                        },
                 }
             );
 
             setMessage(response.data.message);
+
+            setPages(response.data.pages);
+
+            setText(response.data.extractedText);
 
         } catch (error) {
 
@@ -68,9 +82,9 @@ const UploadPage = () => {
 
     return (
 
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-100 p-10">
 
-            <div className="bg-white p-10 rounded-2xl shadow-lg w-[500px]">
+            <div className="bg-white p-10 rounded-2xl shadow-lg max-w-3xl mx-auto">
 
                 <h1 className="text-4xl font-bold text-center mb-6">
                     OpsMind AI
@@ -83,7 +97,9 @@ const UploadPage = () => {
                 <input
                     type="file"
                     accept=".pdf"
-                    onChange={(e) => setPdf(e.target.files[0])}
+                    onChange={(e) =>
+                        setPdf(e.target.files[0])
+                    }
                     className="w-full border p-3 rounded-lg"
                 />
 
@@ -101,6 +117,7 @@ const UploadPage = () => {
 
                 {
                     progress > 0 && (
+
                         <div className="mt-4">
 
                             <div className="w-full bg-gray-300 rounded-full h-4">
@@ -108,7 +125,8 @@ const UploadPage = () => {
                                 <div
                                     className="bg-black h-4 rounded-full"
                                     style={{
-                                        width: `${progress}%`,
+                                        width:
+                                            `${progress}%`,
                                     }}
                                 />
 
@@ -127,6 +145,33 @@ const UploadPage = () => {
                         <p className="text-center mt-4 font-medium">
                             {message}
                         </p>
+                    )
+                }
+
+                {
+                    pages > 0 && (
+                        <p className="mt-4 text-center">
+                            Total Pages: {pages}
+                        </p>
+                    )
+                }
+
+                {
+                    text && (
+
+                        <div className="mt-8">
+
+                            <h2 className="text-2xl font-bold mb-4">
+                                Extracted Text
+                            </h2>
+
+                            <div className="bg-gray-100 p-5 rounded-lg max-h-[400px] overflow-y-auto whitespace-pre-wrap">
+
+                                {text}
+
+                            </div>
+
+                        </div>
                     )
                 }
 
