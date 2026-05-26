@@ -2,7 +2,11 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 
-const extractPDFText = require("../services/pdfService");
+const extractPDFText =
+    require("../services/pdfService");
+
+const createChunks =
+    require("../services/chunkService");
 
 const router = express.Router();
 
@@ -17,7 +21,8 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
 
         const uniqueName =
-            Date.now() + path.extname(file.originalname);
+            Date.now() +
+            path.extname(file.originalname);
 
         cb(null, uniqueName);
     },
@@ -30,7 +35,10 @@ const fileFilter = (req, file, cb) => {
     if (file.mimetype === "application/pdf") {
         cb(null, true);
     } else {
-        cb(new Error("Only PDF files allowed"), false);
+        cb(
+            new Error("Only PDF files allowed"),
+            false
+        );
     }
 };
 
@@ -41,36 +49,46 @@ const upload = multer({
 });
 
 
-// Upload + Parse Route
+// Upload + Parse + Chunk
 router.post(
     "/upload",
     upload.single("pdf"),
+
     async (req, res) => {
 
         try {
 
-            // Uploaded file path
+            // File Path
             const filePath = req.file.path;
 
-            // Extract text
+            // Extract PDF Text
             const pdfData =
                 await extractPDFText(filePath);
 
-            console.log(pdfData.text);
+            // Create Chunks
+            const chunks =
+                createChunks(pdfData.text);
+
+            console.log(chunks);
 
             res.status(200).json({
 
                 success: true,
 
                 message:
-                    "PDF uploaded and parsed successfully",
+                    "PDF uploaded and chunked successfully",
 
-                fileName: req.file.filename,
+                fileName:
+                    req.file.filename,
 
-                pages: pdfData.pages,
+                pages:
+                    pdfData.pages,
 
-                extractedText:
-                    pdfData.text.substring(0, 1000),
+                totalChunks:
+                    chunks.length,
+
+                chunks:
+                    chunks.slice(0, 5),
             });
 
         } catch (error) {
@@ -79,7 +97,8 @@ router.post(
 
             res.status(500).json({
                 success: false,
-                message: "PDF Parsing Failed",
+                message:
+                    "Chunking Failed",
             });
         }
     }
