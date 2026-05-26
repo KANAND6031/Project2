@@ -4,23 +4,33 @@ import API from "../services/api";
 
 const UploadPage = () => {
 
-    const [pdf, setPdf] = useState(null);
+    const [pdf, setPdf] =
+        useState(null);
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] =
+        useState(false);
 
-    const [message, setMessage] = useState("");
+    const [message, setMessage] =
+        useState("");
 
-    const [progress, setProgress] = useState(0);
+    const [progress, setProgress] =
+        useState(0);
 
-    const [text, setText] = useState("");
+    const [pages, setPages] =
+        useState(0);
 
-    const [pages, setPages] = useState(0);
+    const [chunks, setChunks] =
+        useState([]);
 
 
     const handleUpload = async () => {
 
         if (!pdf) {
-            setMessage("Please select a PDF");
+
+            setMessage(
+                "Please select a PDF"
+            );
+
             return;
         }
 
@@ -30,48 +40,66 @@ const UploadPage = () => {
 
             setMessage("");
 
-            const formData = new FormData();
+            const formData =
+                new FormData();
 
-            formData.append("pdf", pdf);
-
-            const response = await API.post(
-                "/upload",
-                formData,
-                {
-                    headers: {
-                        "Content-Type":
-                            "multipart/form-data",
-                    },
-
-                    onUploadProgress:
-                        (progressEvent) => {
-
-                            const percent =
-                                Math.round(
-                                    (
-                                        progressEvent.loaded
-                                        * 100
-                                    )
-                                    /
-                                    progressEvent.total
-                                );
-
-                            setProgress(percent);
-                        },
-                }
+            formData.append(
+                "pdf",
+                pdf
             );
 
-            setMessage(response.data.message);
+            const response =
+                await API.post(
+                    "/upload",
+                    formData,
+                    {
 
-            setPages(response.data.pages);
+                        headers: {
+                            "Content-Type":
+                                "multipart/form-data",
+                        },
 
-            setText(response.data.extractedText);
+                        onUploadProgress:
+                            (
+                                progressEvent
+                            ) => {
+
+                                const percent =
+                                    Math.round(
+                                        (
+                                            progressEvent.loaded
+                                            * 100
+                                        )
+                                        /
+                                        progressEvent.total
+                                    );
+
+                                setProgress(
+                                    percent
+                                );
+                            },
+                    }
+                );
+
+            setMessage(
+                response.data.message
+            );
+
+            setPages(
+                response.data.pages
+            );
+
+            setChunks(
+                response.data.chunks
+            );
 
         } catch (error) {
 
             console.log(error);
 
-            setMessage("Upload failed");
+            setMessage(
+                "Upload failed"
+            );
 
         } finally {
 
@@ -84,7 +112,7 @@ const UploadPage = () => {
 
         <div className="min-h-screen bg-gray-100 p-10">
 
-            <div className="bg-white p-10 rounded-2xl shadow-lg max-w-3xl mx-auto">
+            <div className="bg-white p-10 rounded-2xl shadow-lg max-w-5xl mx-auto">
 
                 <h1 className="text-4xl font-bold text-center mb-6">
                     OpsMind AI
@@ -97,15 +125,21 @@ const UploadPage = () => {
                 <input
                     type="file"
                     accept=".pdf"
+
                     onChange={(e) =>
-                        setPdf(e.target.files[0])
+                        setPdf(
+                            e.target.files[0]
+                        )
                     }
+
                     className="w-full border p-3 rounded-lg"
                 />
 
                 <button
                     onClick={handleUpload}
+
                     disabled={loading}
+
                     className="w-full mt-5 bg-black text-white py-3 rounded-lg hover:bg-gray-800"
                 >
                     {
@@ -124,6 +158,7 @@ const UploadPage = () => {
 
                                 <div
                                     className="bg-black h-4 rounded-full"
+
                                     style={{
                                         width:
                                             `${progress}%`,
@@ -142,6 +177,7 @@ const UploadPage = () => {
 
                 {
                     message && (
+
                         <p className="text-center mt-4 font-medium">
                             {message}
                         </p>
@@ -150,24 +186,70 @@ const UploadPage = () => {
 
                 {
                     pages > 0 && (
+
                         <p className="mt-4 text-center">
-                            Total Pages: {pages}
+                            Total Pages:
+                            {" "}
+                            {pages}
                         </p>
                     )
                 }
 
                 {
-                    text && (
+                    chunks.length > 0 && (
 
-                        <div className="mt-8">
+                        <div className="mt-10">
 
-                            <h2 className="text-2xl font-bold mb-4">
-                                Extracted Text
+                            <h2 className="text-3xl font-bold mb-6">
+                                Generated Chunks
                             </h2>
 
-                            <div className="bg-gray-100 p-5 rounded-lg max-h-[400px] overflow-y-auto whitespace-pre-wrap">
+                            <div className="space-y-6">
 
-                                {text}
+                                {
+                                    chunks.map(
+                                        (
+                                            chunk
+                                        ) => (
+
+                                            <div
+                                                key={
+                                                    chunk.chunkIndex
+                                                }
+
+                                                className="bg-gray-100 p-5 rounded-xl"
+                                            >
+
+                                                <h3 className="font-bold text-lg mb-2">
+                                                    Chunk
+                                                    {" "}
+                                                    {
+                                                        chunk.chunkIndex
+                                                    }
+                                                </h3>
+
+                                                <p className="text-sm mb-2">
+                                                    Word Count:
+                                                    {" "}
+                                                    {
+                                                        chunk.wordCount
+                                                    }
+                                                </p>
+
+                                                <p className="whitespace-pre-wrap text-gray-700">
+                                                    {
+                                                        chunk.text.substring(
+                                                            0,
+                                                            500
+                                                        )
+                                                    }
+                                                    ...
+                                                </p>
+
+                                            </div>
+                                        )
+                                    )
+                                }
 
                             </div>
 
