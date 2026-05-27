@@ -1,36 +1,27 @@
 import { useState } from "react";
-
 import API from "../services/api";
 
 const UploadPage = () => {
 
-    const [pdf, setPdf] =
+    const [pdf, setPdf] = useState(null);
+
+    const [loading, setLoading] = useState(false);
+
+    const [message, setMessage] = useState("");
+
+    const [progress, setProgress] = useState(0);
+
+    const [pages, setPages] = useState(0);
+
+    const [embeddingInfo, setEmbeddingInfo] =
         useState(null);
-
-    const [loading, setLoading] =
-        useState(false);
-
-    const [message, setMessage] =
-        useState("");
-
-    const [progress, setProgress] =
-        useState(0);
-
-    const [pages, setPages] =
-        useState(0);
-
-    const [chunks, setChunks] = useState([]);
-
-    const [embeddingInfo, setEmbeddingInfo] = useState(null);
 
 
     const handleUpload = async () => {
 
         if (!pdf) {
 
-            setMessage(
-                "Please select a PDF"
-            );
+            setMessage("Please select a PDF");
 
             return;
         }
@@ -41,54 +32,42 @@ const UploadPage = () => {
 
             setMessage("");
 
-            const formData =
-                new FormData();
+            setProgress(0);
 
-            formData.append(
-                "pdf",
-                pdf
-            );
+            const formData = new FormData();
 
-            const response =
-                await API.post(
-                    "/upload",
-                    formData,
-                    {
+            formData.append("pdf", pdf);
 
-                        headers: {
-                            "Content-Type":
-                                "multipart/form-data",
-                        },
+            const response = await API.post(
+                "/upload",
+                formData,
+                {
+                    headers: {
+                        "Content-Type":
+                            "multipart/form-data",
+                    },
 
-                        onUploadProgress:
-                            (
-                                progressEvent
-                            ) => {
+                    onUploadProgress:
+                        (progressEvent) => {
 
-                                const percent =
-                                    Math.round(
-                                        (
-                                            progressEvent.loaded
-                                            * 100
-                                        )
-                                        /
-                                        progressEvent.total
-                                    );
-
-                                setProgress(
-                                    percent
+                            const percent =
+                                Math.round(
+                                    (
+                                        progressEvent.loaded * 100
+                                    ) /
+                                    progressEvent.total
                                 );
-                            },
-                    }
-                );
 
-            setMessage(
-                response.data.message
+                            setProgress(percent);
+                        },
+                }
             );
 
-            setPages(
-                response.data.pages
-            );
+            console.log(response.data);
+
+            setMessage(response.data.message);
+
+            setPages(response.data.pages);
 
             setEmbeddingInfo(
                 response.data.sampleEmbedding
@@ -98,9 +77,7 @@ const UploadPage = () => {
 
             console.log(error);
 
-            setMessage(
-                "Upload failed"
-            );
+            setMessage("Upload failed");
 
         } finally {
 
@@ -126,21 +103,15 @@ const UploadPage = () => {
                 <input
                     type="file"
                     accept=".pdf"
-
                     onChange={(e) =>
-                        setPdf(
-                            e.target.files[0]
-                        )
+                        setPdf(e.target.files[0])
                     }
-
                     className="w-full border p-3 rounded-lg"
                 />
 
                 <button
                     onClick={handleUpload}
-
                     disabled={loading}
-
                     className="w-full mt-5 bg-black text-white py-3 rounded-lg hover:bg-gray-800"
                 >
                     {
@@ -159,7 +130,6 @@ const UploadPage = () => {
 
                                 <div
                                     className="bg-black h-4 rounded-full"
-
                                     style={{
                                         width:
                                             `${progress}%`,
@@ -189,116 +159,54 @@ const UploadPage = () => {
                     pages > 0 && (
 
                         <p className="mt-4 text-center">
-                            Total Pages:
-                            {" "}
-                            {pages}
-                            {
-    embeddingInfo && (
-
-        <div className="mt-8 bg-gray-100 p-5 rounded-xl">
-
-            <h2 className="text-2xl font-bold mb-4">
-                Sample Embedding
-            </h2>
-
-            <p className="mb-2">
-                <strong>Chunk:</strong>
-                {" "}
-                {
-                    embeddingInfo.chunkIndex
-                }
-            </p>
-
-            <p className="mb-2">
-                <strong>Word Count:</strong>
-                {" "}
-                {
-                    embeddingInfo.wordCount
-                }
-            </p>
-
-            <p className="mb-4">
-                <strong>Embedding Dimensions:</strong>
-                {" "}
-                {
-                    embeddingInfo.embedding.length
-                }
-            </p>
-
-            <div className="bg-white p-4 rounded-lg max-h-[300px] overflow-y-auto text-sm">
-
-                {
-                    JSON.stringify(
-                        embeddingInfo.embedding.slice(0, 50),
-                        null,
-                        2
-                    )
-                }
-
-            </div>
-
-        </div>
-    )
-}
+                            Total Pages: {pages}
                         </p>
                     )
                 }
 
                 {
-                    chunks.length > 0 && (
+                    embeddingInfo && (
 
-                        <div className="mt-10">
+                        <div className="mt-8 bg-gray-100 p-5 rounded-xl">
 
-                            <h2 className="text-3xl font-bold mb-6">
-                                Generated Chunks
+                            <h2 className="text-2xl font-bold mb-4">
+                                Sample Embedding
                             </h2>
 
-                            <div className="space-y-6">
+                            <p className="mb-2">
+                                <strong>Chunk:</strong>
+                                {" "}
+                                {embeddingInfo.chunkIndex}
+                            </p>
 
+                            <p className="mb-2">
+                                <strong>Word Count:</strong>
+                                {" "}
+                                {embeddingInfo.wordCount}
+                            </p>
+
+                            <p className="mb-4">
+                                <strong>
+                                    Embedding Dimensions:
+                                </strong>
+                                {" "}
                                 {
-                                    chunks.map(
-                                        (
-                                            chunk
-                                        ) => (
-
-                                            <div
-                                                key={
-                                                    chunk.chunkIndex
-                                                }
-
-                                                className="bg-gray-100 p-5 rounded-xl"
-                                            >
-
-                                                <h3 className="font-bold text-lg mb-2">
-                                                    Chunk
-                                                    {" "}
-                                                    {
-                                                        chunk.chunkIndex
-                                                    }
-                                                </h3>
-
-                                                <p className="text-sm mb-2">
-                                                    Word Count:
-                                                    {" "}
-                                                    {
-                                                        chunk.wordCount
-                                                    }
-                                                </p>
-
-                                                <p className="whitespace-pre-wrap text-gray-700">
-                                                    {
-                                                        chunk.text.substring(
-                                                            0,
-                                                            500
-                                                        )
-                                                    }
-                                                    ...
-                                                </p>
-
-                                            </div>
-                                        )
-                                    )
+                                    embeddingInfo.embedding
+                                        ?.length
                                 }
+                            </p>
+
+                            <div className="bg-white p-4 rounded-lg max-h-[300px] overflow-y-auto text-sm">
+
+                                <pre>
+                                    {
+                                        JSON.stringify(
+                                            embeddingInfo.embedding?.slice(0, 50),
+                                            null,
+                                            2
+                                        )
+                                    }
+                                </pre>
 
                             </div>
 

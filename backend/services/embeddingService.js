@@ -11,13 +11,21 @@ const generateEmbedding = async (text) => {
 
     try {
 
-        const embeddingModel =
+        const model =
             genAI.getGenerativeModel({
                 model: "embedding-001",
             });
 
         const result =
-            await embeddingModel.embedContent(text);
+            await model.embedContent({
+                content: {
+                    parts: [
+                        {
+                            text: text,
+                        },
+                    ],
+                },
+            });
 
         return result.embedding.values;
 
