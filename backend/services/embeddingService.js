@@ -1,33 +1,22 @@
-const {
-    GoogleGenerativeAI
-} = require("@google/generative-ai");
+const OpenAI = require("openai");
 
-const genAI =
-    new GoogleGenerativeAI(
-        process.env.GEMINI_API_KEY
-    );
+const client = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
 
 const generateEmbedding = async (text) => {
 
     try {
 
-        const model =
-            genAI.getGenerativeModel({
-                model: "embedding-001",
+        const response =
+            await client.embeddings.create({
+
+                model: "text-embedding-3-small",
+
+                input: text,
             });
 
-        const result =
-            await model.embedContent({
-                content: {
-                    parts: [
-                        {
-                            text: text,
-                        },
-                    ],
-                },
-            });
-
-        return result.embedding.values;
+        return response.data[0].embedding;
 
     } catch (error) {
 
