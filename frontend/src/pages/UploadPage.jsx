@@ -19,8 +19,9 @@ const UploadPage = () => {
     const [pages, setPages] =
         useState(0);
 
-    const [chunks, setChunks] =
-        useState([]);
+    const [chunks, setChunks] = useState([]);
+
+    const [embeddingInfo, setEmbeddingInfo] = useState(null);
 
 
     const handleUpload = async () => {
@@ -89,8 +90,8 @@ const UploadPage = () => {
                 response.data.pages
             );
 
-            setChunks(
-                response.data.chunks
+            setEmbeddingInfo(
+                response.data.sampleEmbedding
             );
 
         } catch (error) {
@@ -191,6 +192,54 @@ const UploadPage = () => {
                             Total Pages:
                             {" "}
                             {pages}
+                            {
+    embeddingInfo && (
+
+        <div className="mt-8 bg-gray-100 p-5 rounded-xl">
+
+            <h2 className="text-2xl font-bold mb-4">
+                Sample Embedding
+            </h2>
+
+            <p className="mb-2">
+                <strong>Chunk:</strong>
+                {" "}
+                {
+                    embeddingInfo.chunkIndex
+                }
+            </p>
+
+            <p className="mb-2">
+                <strong>Word Count:</strong>
+                {" "}
+                {
+                    embeddingInfo.wordCount
+                }
+            </p>
+
+            <p className="mb-4">
+                <strong>Embedding Dimensions:</strong>
+                {" "}
+                {
+                    embeddingInfo.embedding.length
+                }
+            </p>
+
+            <div className="bg-white p-4 rounded-lg max-h-[300px] overflow-y-auto text-sm">
+
+                {
+                    JSON.stringify(
+                        embeddingInfo.embedding.slice(0, 50),
+                        null,
+                        2
+                    )
+                }
+
+            </div>
+
+        </div>
+    )
+}
                         </p>
                     )
                 }
