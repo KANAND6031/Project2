@@ -1,22 +1,36 @@
-const OpenAI = require("openai");
+const { pipeline } =
+    require("@xenova/transformers");
 
-const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+let extractor;
+
+const loadModel = async () => {
+
+    if (!extractor) {
+
+        extractor = await pipeline(
+            "feature-extraction",
+            "Xenova/all-MiniLM-L6-v2"
+        );
+    }
+
+    return extractor;
+};
+
 
 const generateEmbedding = async (text) => {
 
     try {
 
-        const response =
-            await client.embeddings.create({
+        const extractor =
+            await loadModel();
 
-                model: "text-embedding-3-small",
-
-                input: text,
+        const output =
+            await extractor(text, {
+                pooling: "mean",
+                normalize: true,
             });
 
-        return response.data[0].embedding;
+        return Array.from(output.data);
 
     } catch (error) {
 
