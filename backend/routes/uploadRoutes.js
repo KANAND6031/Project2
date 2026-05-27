@@ -8,6 +8,9 @@ const extractPDFText =
 const createChunks =
     require("../services/chunkService");
 
+const generateEmbedding =
+    require("../services/embeddingService");
+
 const router = express.Router();
 
 
@@ -33,8 +36,11 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
 
     if (file.mimetype === "application/pdf") {
+
         cb(null, true);
+
     } else {
+
         cb(
             new Error("Only PDF files allowed"),
             false
@@ -49,7 +55,7 @@ const upload = multer({
 });
 
 
-// Upload + Parse + Chunk
+// Upload + Parse + Chunk + Embedding
 router.post(
     "/upload",
     upload.single("pdf"),
@@ -59,9 +65,10 @@ router.post(
         try {
 
             // File Path
-            const filePath = req.file.path;
+            const filePath =
+                req.file.path;
 
-            // Extract PDF Text
+            // Extract Text
             const pdfData =
                 await extractPDFText(filePath);
 
@@ -69,26 +76,57 @@ router.post(
             const chunks =
                 createChunks(pdfData.text);
 
-            console.log(chunks);
+            // Generate Embeddings
+            const embeddedChunks = [];
+
+            for (const chunk of chunks) {
+
+                console.log(
+                    `Generating embedding for chunk ${chunk.chunkIndex}`
+                );
+
+                const embedding =
+                    await generateEmbedding(
+                        chunk.text
+                    );
+
+                embeddedChunks.push({
+
+                    chunkIndex:
+                        chunk.chunkIndex,
+
+                    text:
+                        chunk.text,
+
+                    wordCount:
+                        chunk.wordCount,
+
+                    embedding,
+
+                    metadata:
+                        chunk.metadata,
+                });
+            }
+
+            console.log(
+                embeddedChunks[0]
+            );
 
             res.status(200).json({
 
                 success: true,
 
                 message:
-                    "PDF uploaded and chunked successfully",
-
-                fileName:
-                    req.file.filename,
+                    "Embeddings generated successfully",
 
                 pages:
                     pdfData.pages,
 
                 totalChunks:
-                    chunks.length,
+                    embeddedChunks.length,
 
-                chunks:
-                    chunks.slice(0, 5),
+                sampleEmbedding:
+                    embeddedChunks[0],
             });
 
         } catch (error) {
@@ -96,9 +134,11 @@ router.post(
             console.log(error);
 
             res.status(500).json({
+
                 success: false,
+
                 message:
-                    "Chunking Failed",
+                    "Embedding Generation Failed",
             });
         }
     }
