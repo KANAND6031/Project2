@@ -46,6 +46,15 @@ router.post(
                             limit: 5,
                         },
                     },
+                    {
+            $project: {
+                text: 1,
+                chunkIndex: 1,
+                score: {
+                    $meta: "vectorSearchScore"
+                }
+            }
+        }
                 ]);
 
             res.json(results);
