@@ -11,6 +11,9 @@ const createChunks =
 const generateEmbedding =
     require("../services/embeddingService");
 
+const Chunk =
+    require("../models/Chunk");
+
 const router = express.Router();
 
 
@@ -55,7 +58,7 @@ const upload = multer({
 });
 
 
-// Upload + Parse + Chunk + Embedding
+// Upload + Parse + Chunk + Embedding + Store
 router.post(
     "/upload",
     upload.single("pdf"),
@@ -64,19 +67,19 @@ router.post(
 
         try {
 
-            // File Path
+            // Uploaded file path
             const filePath =
                 req.file.path;
 
-            // Extract Text
+            // Extract PDF text
             const pdfData =
                 await extractPDFText(filePath);
 
-            // Create Chunks
+            // Create chunks
             const chunks =
                 createChunks(pdfData.text);
 
-            // Generate Embeddings
+            // Generate embeddings
             const embeddedChunks = [];
 
             for (const chunk of chunks) {
@@ -91,6 +94,9 @@ router.post(
                     );
 
                 embeddedChunks.push({
+
+                    fileName:
+                        req.file.originalname,
 
                     chunkIndex:
                         chunk.chunkIndex,
@@ -108,8 +114,19 @@ router.post(
                 });
             }
 
+            // Remove previous chunks of same file
+            await Chunk.deleteMany({
+                fileName:
+                    req.file.originalname,
+            });
+
+            // Store in MongoDB
+            await Chunk.insertMany(
+                embeddedChunks
+            );
+
             console.log(
-                embeddedChunks[0]
+                `Stored ${embeddedChunks.length} chunks`
             );
 
             res.status(200).json({
@@ -117,7 +134,7 @@ router.post(
                 success: true,
 
                 message:
-                    "Embeddings generated successfully",
+                    "Chunks stored successfully",
 
                 pages:
                     pdfData.pages,
@@ -126,7 +143,19 @@ router.post(
                     embeddedChunks.length,
 
                 sampleEmbedding:
-                    embeddedChunks[0],
+                    {
+                        chunkIndex:
+                            embeddedChunks[0]
+                                .chunkIndex,
+
+                        wordCount:
+                            embeddedChunks[0]
+                                .wordCount,
+
+                        embedding:
+                            embeddedChunks[0]
+                                .embedding,
+                    },
             });
 
         } catch (error) {
