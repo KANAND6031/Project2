@@ -120,6 +120,9 @@ router.post(
                     req.file.originalname,
             });
 
+            // temporary fix....
+            await Chunk.deleteMany({});
+            
             // Store in MongoDB
             await Chunk.insertMany(
                 embeddedChunks
