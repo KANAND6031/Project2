@@ -3,221 +3,317 @@ import API from "../services/api";
 
 const UploadPage = () => {
 
-    const [pdf, setPdf] = useState(null);
 
-    const [loading, setLoading] = useState(false);
+const [pdf, setPdf] = useState(null);
 
-    const [message, setMessage] = useState("");
+const [loading, setLoading] = useState(false);
 
-    const [progress, setProgress] = useState(0);
+const [message, setMessage] = useState("");
 
-    const [pages, setPages] = useState(0);
+const [progress, setProgress] = useState(0);
 
-    const [embeddingInfo, setEmbeddingInfo] =
-        useState(null);
+const [pages, setPages] = useState(0);
+
+const [embeddingInfo, setEmbeddingInfo] =
+    useState(null);
+
+const [query, setQuery] =
+    useState("");
+
+const [results, setResults] =
+    useState([]);
 
 
-    const handleUpload = async () => {
+const handleUpload = async () => {
 
-        if (!pdf) {
+    if (!pdf) {
 
-            setMessage("Please select a PDF");
+        setMessage("Please select a PDF");
 
-            return;
-        }
+        return;
+    }
 
-        try {
+    try {
 
-            setLoading(true);
+        setLoading(true);
 
-            setMessage("");
+        setMessage("");
 
-            setProgress(0);
+        setProgress(0);
 
-            const formData = new FormData();
+        const formData = new FormData();
 
-            formData.append("pdf", pdf);
+        formData.append("pdf", pdf);
 
-            const response = await API.post(
-                "/upload",
-                formData,
-                {
-                    headers: {
-                        "Content-Type":
-                            "multipart/form-data",
+        const response = await API.post(
+            "/upload",
+            formData,
+            {
+                headers: {
+                    "Content-Type":
+                        "multipart/form-data",
+                },
+
+                onUploadProgress:
+                    (progressEvent) => {
+
+                        const percent =
+                            Math.round(
+                                (
+                                    progressEvent.loaded * 100
+                                ) /
+                                progressEvent.total
+                            );
+
+                        setProgress(percent);
                     },
+            }
+        );
 
-                    onUploadProgress:
-                        (progressEvent) => {
+        setMessage(response.data.message);
 
-                            const percent =
-                                Math.round(
-                                    (
-                                        progressEvent.loaded * 100
-                                    ) /
-                                    progressEvent.total
-                                );
+        setPages(response.data.pages);
 
-                            setProgress(percent);
-                        },
+        setEmbeddingInfo(
+            response.data.sampleEmbedding
+        );
+
+    } catch (error) {
+
+        console.log(error);
+
+        setMessage("Upload failed");
+
+    } finally {
+
+        setLoading(false);
+    }
+};
+
+
+const handleSearch = async () => {
+
+    try {
+
+        const response =
+            await API.post(
+                "/search",
+                {
+                    query,
                 }
             );
 
-            console.log(response.data);
+        setResults(
+            response.data.results
+        );
 
-            setMessage(response.data.message);
+    } catch (error) {
 
-            setPages(response.data.pages);
-
-            setEmbeddingInfo(
-                response.data.sampleEmbedding
-            );
-
-        } catch (error) {
-
-            console.log(error);
-
-            setMessage("Upload failed");
-
-        } finally {
-
-            setLoading(false);
-        }
-    };
+        console.log(error);
+    }
+};
 
 
-    return (
+return (
 
-        <div className="min-h-screen bg-gray-100 p-10">
+    <div className="min-h-screen bg-gray-100 p-10">
 
-            <div className="bg-white p-10 rounded-2xl shadow-lg max-w-5xl mx-auto">
+        <div className="bg-white p-10 rounded-2xl shadow-lg max-w-5xl mx-auto">
 
-                <h1 className="text-4xl font-bold text-center mb-6">
-                    OpsMind AI
-                </h1>
+            <h1 className="text-4xl font-bold text-center mb-6">
+                OpsMind AI
+            </h1>
 
-                <p className="text-gray-600 text-center mb-8">
-                    Upload SOP PDF documents
-                </p>
+            <p className="text-gray-600 text-center mb-8">
+                Upload SOP PDF documents
+            </p>
+
+            <input
+                type="file"
+                accept=".pdf"
+                onChange={(e) =>
+                    setPdf(e.target.files[0])
+                }
+                className="w-full border p-3 rounded-lg"
+            />
+
+            <button
+                onClick={handleUpload}
+                disabled={loading}
+                className="w-full mt-5 bg-black text-white py-3 rounded-lg hover:bg-gray-800"
+            >
+                {
+                    loading
+                        ? "Uploading..."
+                        : "Upload PDF"
+                }
+            </button>
+
+            {
+                progress > 0 && (
+
+                    <div className="mt-4">
+
+                        <div className="w-full bg-gray-300 rounded-full h-4">
+
+                            <div
+                                className="bg-black h-4 rounded-full"
+                                style={{
+                                    width:
+                                        `${progress}%`,
+                                }}
+                            />
+
+                        </div>
+
+                        <p className="text-center mt-2">
+                            {progress}%
+                        </p>
+
+                    </div>
+                )
+            }
+
+            {
+                message && (
+
+                    <p className="text-center mt-4 font-medium">
+                        {message}
+                    </p>
+                )
+            }
+
+            {
+                pages > 0 && (
+
+                    <p className="mt-4 text-center">
+                        Total Pages: {pages}
+                    </p>
+                )
+            }
+
+            {
+                embeddingInfo && (
+
+                    <div className="mt-8 bg-gray-100 p-5 rounded-xl">
+
+                        <h2 className="text-2xl font-bold mb-4">
+                            Sample Embedding
+                        </h2>
+
+                        <p>
+                            <strong>Chunk:</strong>
+                            {" "}
+                            {embeddingInfo.chunkIndex}
+                        </p>
+
+                        <p>
+                            <strong>Word Count:</strong>
+                            {" "}
+                            {embeddingInfo.wordCount}
+                        </p>
+
+                        <p>
+                            <strong>
+                                Embedding Dimensions:
+                            </strong>
+                            {" "}
+                            {
+                                embeddingInfo.embedding?.length
+                            }
+                        </p>
+
+                    </div>
+                )
+            }
+
+            <div className="mt-10">
+
+                <h2 className="text-2xl font-bold mb-4">
+                    Ask Questions
+                </h2>
 
                 <input
-                    type="file"
-                    accept=".pdf"
+                    type="text"
+                    value={query}
                     onChange={(e) =>
-                        setPdf(e.target.files[0])
+                        setQuery(
+                            e.target.value
+                        )
                     }
+                    placeholder="Ask about the document..."
                     className="w-full border p-3 rounded-lg"
                 />
 
                 <button
-                    onClick={handleUpload}
-                    disabled={loading}
-                    className="w-full mt-5 bg-black text-white py-3 rounded-lg hover:bg-gray-800"
+                    onClick={handleSearch}
+                    className="w-full mt-3 bg-blue-600 text-white py-3 rounded-lg"
                 >
-                    {
-                        loading
-                            ? "Uploading..."
-                            : "Upload PDF"
-                    }
+                    Search
                 </button>
-
-                {
-                    progress > 0 && (
-
-                        <div className="mt-4">
-
-                            <div className="w-full bg-gray-300 rounded-full h-4">
-
-                                <div
-                                    className="bg-black h-4 rounded-full"
-                                    style={{
-                                        width:
-                                            `${progress}%`,
-                                    }}
-                                />
-
-                            </div>
-
-                            <p className="text-center mt-2">
-                                {progress}%
-                            </p>
-
-                        </div>
-                    )
-                }
-
-                {
-                    message && (
-
-                        <p className="text-center mt-4 font-medium">
-                            {message}
-                        </p>
-                    )
-                }
-
-                {
-                    pages > 0 && (
-
-                        <p className="mt-4 text-center">
-                            Total Pages: {pages}
-                        </p>
-                    )
-                }
-
-                {
-                    embeddingInfo && (
-
-                        <div className="mt-8 bg-gray-100 p-5 rounded-xl">
-
-                            <h2 className="text-2xl font-bold mb-4">
-                                Sample Embedding
-                            </h2>
-
-                            <p className="mb-2">
-                                <strong>Chunk:</strong>
-                                {" "}
-                                {embeddingInfo.chunkIndex}
-                            </p>
-
-                            <p className="mb-2">
-                                <strong>Word Count:</strong>
-                                {" "}
-                                {embeddingInfo.wordCount}
-                            </p>
-
-                            <p className="mb-4">
-                                <strong>
-                                    Embedding Dimensions:
-                                </strong>
-                                {" "}
-                                {
-                                    embeddingInfo.embedding
-                                        ?.length
-                                }
-                            </p>
-
-                            <div className="bg-white p-4 rounded-lg max-h-[300px] overflow-y-auto text-sm">
-
-                                <pre>
-                                    {
-                                        JSON.stringify(
-                                            embeddingInfo.embedding?.slice(0, 50),
-                                            null,
-                                            2
-                                        )
-                                    }
-                                </pre>
-
-                            </div>
-
-                        </div>
-                    )
-                }
 
             </div>
 
+            {
+                results.length > 0 && (
+
+                    <div className="mt-10">
+
+                        <h2 className="text-2xl font-bold mb-4">
+                            Retrieved Chunks
+                        </h2>
+
+                        {
+                            results.map(
+                                (
+                                    item,
+                                    index
+                                ) => (
+
+                                    <div
+                                        key={index}
+                                        className="bg-gray-100 p-4 rounded-lg mb-4"
+                                    >
+
+                                        <p>
+                                            <strong>
+                                                Score:
+                                            </strong>
+                                            {" "}
+                                            {
+                                                item.score?.toFixed(4)
+                                            }
+                                        </p>
+
+                                        <p>
+                                            <strong>
+                                                Chunk:
+                                            </strong>
+                                            {" "}
+                                            {
+                                                item.chunkIndex
+                                            }
+                                        </p>
+
+                                        <p className="mt-3 whitespace-pre-wrap">
+                                            {item.text}
+                                        </p>
+
+                                    </div>
+                                )
+                            )
+                        }
+
+                    </div>
+                )
+            }
+
         </div>
-    );
+
+    </div>
+);
+
+
 };
 
 export default UploadPage;

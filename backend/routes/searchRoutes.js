@@ -21,6 +21,19 @@ router.post(
             const { query } =
                 req.body;
 
+            if (!query) {
+
+                return res.status(400).json({
+                    error:
+                        "Query required",
+                });
+            }
+
+            console.log(
+                "Searching for:",
+                query
+            );
+
             const queryEmbedding =
                 await generateEmbedding(
                     query
@@ -46,26 +59,50 @@ router.post(
                             limit: 5,
                         },
                     },
+
                     {
-            $project: {
-                text: 1,
-                chunkIndex: 1,
-                score: {
-                    $meta: "vectorSearchScore"
-                }
-            }
-        }
+                        $project: {
+
+                            _id: 0,
+
+                            fileName: 1,
+
+                            chunkIndex: 1,
+
+                            text: 1,
+
+                            wordCount: 1,
+
+                            score: {
+                                $meta:
+                                    "vectorSearchScore",
+                            },
+                        },
+                    },
                 ]);
 
-            res.json(results);
+            res.status(200).json({
+
+                success: true,
+
+                query,
+
+                totalResults:
+                    results.length,
+
+                results,
+            });
 
         } catch (error) {
 
             console.log(error);
 
             res.status(500).json({
+
+                success: false,
+
                 error:
-                    "Search failed",
+                    "Retrieval Failed",
             });
         }
     }
