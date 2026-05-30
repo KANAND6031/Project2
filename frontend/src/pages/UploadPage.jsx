@@ -208,9 +208,9 @@ return (
                         </p>
 
                         <p>
-                            <strong>Word Count:</strong>
+                            <strong>Character Count:</strong>
                             {" "}
-                            {embeddingInfo.wordCount}
+                            {embeddingInfo.charCount}
                         </p>
 
                         <p>

@@ -1,19 +1,23 @@
 const mongoose = require("mongoose");
 
-const chunkSchema = new mongoose.Schema({
+const chunkSchema =
+new mongoose.Schema({
+
     fileName: String,
 
     chunkIndex: Number,
 
     text: String,
 
-    wordCount: Number,
+    charCount: Number,
 
     embedding: [Number],
 
     metadata: {
-        startWord: Number,
-        endWord: Number,
+
+        startChar: Number,
+
+        endChar: Number,
     },
 });
 

@@ -104,8 +104,8 @@ router.post(
                     text:
                         chunk.text,
 
-                    wordCount:
-                        chunk.wordCount,
+                    charCount:
+                        chunk.charCount,
 
                     embedding,
 
@@ -122,7 +122,7 @@ router.post(
 
             // temporary fix....
             await Chunk.deleteMany({});
-            
+
             // Store in MongoDB
             await Chunk.insertMany(
                 embeddedChunks
@@ -151,9 +151,8 @@ router.post(
                             embeddedChunks[0]
                                 .chunkIndex,
 
-                        wordCount:
-                            embeddedChunks[0]
-                                .wordCount,
+                        charCount:
+                            embeddedChunks[0].charCount,
 
                         embedding:
                             embeddedChunks[0]

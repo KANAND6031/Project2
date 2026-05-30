@@ -1,26 +1,23 @@
-const createChunks = (
-    text,
-    chunkSize = 800,
-    overlap = 150
-) => {
+function createChunks(text) {
 
-    const words = text.split(/\s+/);
+    const chunkSize = 1000;
+    const overlap = 100;
 
     const chunks = [];
 
     let start = 0;
-
     let chunkIndex = 0;
 
-    while (start < words.length) {
+    while (start < text.length) {
 
-        const end = start + chunkSize;
-
-        const chunkWords =
-            words.slice(start, end);
+        const end =
+            Math.min(
+                start + chunkSize,
+                text.length
+            );
 
         const chunkText =
-            chunkWords.join(" ");
+            text.slice(start, end);
 
         chunks.push({
 
@@ -28,23 +25,29 @@ const createChunks = (
 
             text: chunkText,
 
-            wordCount:
-                chunkWords.length,
+            charCount:
+                chunkText.length,
 
             metadata: {
 
-                startWord: start,
+                startChar:
+                    start,
 
-                endWord: end,
+                endChar:
+                    end,
             },
         });
 
-        start += chunkSize - overlap;
+        start =
+            start +
+            chunkSize -
+            overlap;
 
         chunkIndex++;
     }
 
     return chunks;
-};
+}
 
-module.exports = createChunks;
+module.exports =
+    createChunks;
