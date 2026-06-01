@@ -23,6 +23,8 @@ const [query, setQuery] =
 const [results, setResults] =
     useState([]);
 
+const [answer, setAnswer] = useState("");
+
 
 const handleUpload = async () => {
 
@@ -103,9 +105,13 @@ const handleSearch = async () => {
                 }
             );
 
-        setResults(
-            response.data.results
-        );
+        setAnswer(
+    response.data.answer
+);
+
+setResults(
+    response.data.sources
+);
 
     } catch (error) {
 
@@ -255,58 +261,81 @@ return (
             </div>
 
             {
-                results.length > 0 && (
+    answer && (
 
-                    <div className="mt-10">
+        <div className="mt-8">
 
-                        <h2 className="text-2xl font-bold mb-4">
-                            Retrieved Chunks
-                        </h2>
+            <h2 className="text-2xl font-bold mb-4">
+                Answer
+            </h2>
 
-                        {
-                            results.map(
-                                (
-                                    item,
-                                    index
-                                ) => (
+            <div className="bg-green-100 p-5 rounded-lg">
 
-                                    <div
-                                        key={index}
-                                        className="bg-gray-100 p-4 rounded-lg mb-4"
-                                    >
+                <p className="whitespace-pre-wrap">
+                    {answer}
+                </p>
 
-                                        <p>
-                                            <strong>
-                                                Score:
-                                            </strong>
-                                            {" "}
-                                            {
-                                                item.score?.toFixed(4)
-                                            }
-                                        </p>
+            </div>
 
-                                        <p>
-                                            <strong>
-                                                Chunk:
-                                            </strong>
-                                            {" "}
-                                            {
-                                                item.chunkIndex
-                                            }
-                                        </p>
+        </div>
+    )
+}
 
-                                        <p className="mt-3 whitespace-pre-wrap">
-                                            {item.text}
-                                        </p>
+{
+    results.length > 0 && (
 
-                                    </div>
-                                )
-                            )
-                        }
+        <div className="mt-10">
 
-                    </div>
+            <h2 className="text-2xl font-bold mb-4">
+                Sources
+            </h2>
+
+            {
+                results.map(
+                    (
+                        item,
+                        index
+                    ) => (
+
+                        <div
+                            key={index}
+                            className="bg-gray-100 p-4 rounded-lg mb-4"
+                        >
+
+                            <p>
+
+                                <strong>
+                                    Chunk:
+                                </strong>
+
+                                {" "}
+
+                                {item.chunk}
+
+                            </p>
+
+                            <p>
+
+                                <strong>
+                                    Score:
+                                </strong>
+
+                                {" "}
+
+                                {
+                                    item.score?.toFixed(4)
+                                }
+
+                            </p>
+
+                        </div>
+                    )
                 )
             }
+
+        </div>
+    )
+}
 
         </div>
 

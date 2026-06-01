@@ -10,6 +10,12 @@ const Chunk =
 const generateEmbedding =
     require("../services/embeddingService");
 
+const generateAnswer =
+    require("../services/geminiService");
+
+const buildPrompt =
+    require("../services/promptService");
+
 
 router.post(
     "/search",
@@ -24,6 +30,9 @@ router.post(
             if (!query) {
 
                 return res.status(400).json({
+
+                    success: false,
+
                     error:
                         "Query required",
                 });
@@ -34,11 +43,13 @@ router.post(
                 query
             );
 
+            // Generate embedding for user query
             const queryEmbedding =
                 await generateEmbedding(
                     query
                 );
 
+            // Vector Search
             const results =
                 await Chunk.aggregate([
                     {
@@ -56,7 +67,8 @@ router.post(
                             numCandidates:
                                 100,
 
-                            limit: 5,
+                            limit:
+                                5,
                         },
                     },
 
@@ -71,8 +83,6 @@ router.post(
 
                             text: 1,
 
-                            wordCount: 1,
-
                             score: {
                                 $meta:
                                     "vectorSearchScore",
@@ -81,21 +91,74 @@ router.post(
                     },
                 ]);
 
+            // No matching chunks
+            if (
+                results.length === 0
+            ) {
+
+                return res.status(200).json({
+
+                    success: true,
+
+                    answer:
+                        "I don't know based on uploaded SOPs.",
+
+                    sources: [],
+                });
+            }
+
+            // Build Context
+            const context =
+
+                results
+                    .map(
+                        (chunk) =>
+
+                            `Chunk ${chunk.chunkIndex}
+
+${chunk.text}`
+                    )
+                    .join("\n\n");
+
+            // Build Prompt
+            const prompt =
+                buildPrompt(
+                    query,
+                    context
+                );
+
+            // Gemini Answer
+            const answer =
+                await generateAnswer(
+                    prompt
+                );
+
             res.status(200).json({
 
                 success: true,
 
-                query,
+                answer,
 
-                totalResults:
-                    results.length,
+                sources:
 
-                results,
+                    results.map(
+                        (item) => ({
+
+                            chunk:
+                                item.chunkIndex,
+
+                            score:
+                                item.score,
+                        })
+                    ),
             });
 
         } catch (error) {
 
-            console.log(error);
+            console.error(
+                "Search Error:",
+                error
+            );
 
             res.status(500).json({
 
