@@ -8,6 +8,12 @@ const testRoutes = require("./routes/testRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 
 const app = express();
+app.use(
+    cors({
+        origin: true,
+        credentials: true,
+    })
+);
 
 connectDB();
 

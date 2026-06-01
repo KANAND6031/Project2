@@ -1,19 +1,11 @@
 const {
     GoogleGenerativeAI
-} = require(
-    "@google/generative-ai"
-);
+} = require("@google/generative-ai");
 
 const genAI =
     new GoogleGenerativeAI(
         process.env.GEMINI_API_KEY
     );
-
-const model =
-    genAI.getGenerativeModel({
-        model:
-            "gemini-1.5-flash",
-    });
 
 async function generateAnswer(
     prompt
@@ -21,25 +13,31 @@ async function generateAnswer(
 
     try {
 
+        const model =
+            genAI.getGenerativeModel({
+                model: "gemini-2.0-flash"
+            });
+
         const result =
             await model.generateContent(
                 prompt
             );
 
-        const response =
-            await result.response;
+        console.log(
+            result.response.text()
+        );
 
-        return response.text();
+        return result.response.text();
 
     } catch (error) {
 
-        console.log(error);
-
-        throw new Error(
-            "Gemini Generation Failed"
+        console.error(
+            "Gemini Error:",
+            error
         );
+
+        throw error;
     }
 }
 
-module.exports =
-    generateAnswer;
+module.exports = generateAnswer;
