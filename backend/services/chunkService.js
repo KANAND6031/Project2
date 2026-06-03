@@ -1,3 +1,6 @@
+const extractSection =
+require("./sectionService");
+
 function createChunks(text) {
 
     const chunkSize = 1000;

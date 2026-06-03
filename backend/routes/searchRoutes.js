@@ -147,6 +147,14 @@ ${chunk.text}`
 
                     results.map(
                         (item) => ({
+                            fileName:
+                                item.fileName,
+
+                            pageNumber:
+                                item.pageNumber,
+
+                            section:
+                                item.section,
 
                             chunk:
                                 item.chunkIndex,

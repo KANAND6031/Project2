@@ -281,6 +281,8 @@ return (
     )
 }
 
+//...
+
 {
     results.length > 0 && (
 
@@ -303,29 +305,56 @@ return (
                         >
 
                             <p>
-
                                 <strong>
-                                    Chunk:
+                                    File:
                                 </strong>
-
                                 {" "}
-
-                                {item.chunk}
-
+                                {
+                                    item.fileName ||
+                                    "Unknown"
+                                }
                             </p>
 
                             <p>
+                                <strong>
+                                    Page:
+                                </strong>
+                                {" "}
+                                {
+                                    item.pageNumber ||
+                                    "N/A"
+                                }
+                            </p>
 
+                            <p>
+                                <strong>
+                                    Section:
+                                </strong>
+                                {" "}
+                                {
+                                    item.section ||
+                                    "N/A"
+                                }
+                            </p>
+
+                            <p>
+                                <strong>
+                                    Chunk:
+                                </strong>
+                                {" "}
+                                {
+                                    item.chunk
+                                }
+                            </p>
+
+                            <p>
                                 <strong>
                                     Score:
                                 </strong>
-
                                 {" "}
-
                                 {
                                     item.score?.toFixed(4)
                                 }
-
                             </p>
 
                         </div>
