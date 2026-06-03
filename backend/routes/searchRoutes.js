@@ -79,6 +79,10 @@ router.post(
 
                             fileName: 1,
 
+                            pageNumber: 1,
+
+                            section: 1,
+
                             chunkIndex: 1,
 
                             text: 1,

@@ -5,6 +5,10 @@ new mongoose.Schema({
 
     fileName: String,
 
+    pageNumber: Number,
+
+    section: String,
+
     chunkIndex: Number,
 
     text: String,

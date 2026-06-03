@@ -28,6 +28,11 @@ function createChunks(text) {
             charCount:
                 chunkText.length,
 
+            pageNumber: 1,
+
+            section:
+                extractSection(text),
+
             metadata: {
 
                 startChar:

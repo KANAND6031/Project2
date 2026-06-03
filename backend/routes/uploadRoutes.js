@@ -98,6 +98,12 @@ router.post(
                     fileName:
                         req.file.originalname,
 
+                    pageNumber:
+                        chunk.pageNumber,
+
+                    section:
+                        chunk.section,
+
                     chunkIndex:
                         chunk.chunkIndex,
 
