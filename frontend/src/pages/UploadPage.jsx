@@ -281,7 +281,6 @@ return (
     )
 }
 
-//...
 
 {
     results.length > 0 && (
@@ -326,16 +325,7 @@ return (
                                 }
                             </p>
 
-                            <p>
-                                <strong>
-                                    Section:
-                                </strong>
-                                {" "}
-                                {
-                                    item.section ||
-                                    "N/A"
-                                }
-                            </p>
+                                
 
                             <p>
                                 <strong>

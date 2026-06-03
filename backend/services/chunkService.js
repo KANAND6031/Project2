@@ -1,58 +1,65 @@
 const extractSection =
 require("./sectionService");
 
-function createChunks(text) {
+function createChunks(
+    pages
+) {
 
     const chunkSize = 1000;
+
     const overlap = 100;
 
     const chunks = [];
 
-    let start = 0;
     let chunkIndex = 0;
 
-    while (start < text.length) {
+    pages.forEach(
+        (page) => {
 
-        const end =
-            Math.min(
-                start + chunkSize,
+            const text =
+                page.text;
+
+            let start = 0;
+
+            while (
+                start <
                 text.length
-            );
+            ) {
 
-        const chunkText =
-            text.slice(start, end);
+                const chunkText =
+                    text.slice(
+                        start,
+                        start +
+                        chunkSize
+                    );
 
-        chunks.push({
+                chunks.push({
 
-            chunkIndex,
+                    chunkIndex,
 
-            text: chunkText,
+                    text:
+                        chunkText,
 
-            charCount:
-                chunkText.length,
+                    charCount:
+                        chunkText.length,
 
-            pageNumber: 1,
+                    pageNumber:
+                        page.pageNumber,
 
-            section:
-                extractSection(text),
+                    section:
+                        extractSection(
+                            chunkText
+                        )
+                });
 
-            metadata: {
+                chunkIndex++;
 
-                startChar:
-                    start,
-
-                endChar:
-                    end,
-            },
-        });
-
-        start =
-            start +
-            chunkSize -
-            overlap;
-
-        chunkIndex++;
-    }
+                start +=
+                    chunkSize -
+                    overlap;
+            }
+        }
+    );
 
     return chunks;
 }

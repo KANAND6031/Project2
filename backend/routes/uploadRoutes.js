@@ -77,7 +77,7 @@ router.post(
 
             // Create chunks
             const chunks =
-                createChunks(pdfData.text);
+                createChunks(pdfData.pages);
 
             // Generate embeddings
             const embeddedChunks = [];
