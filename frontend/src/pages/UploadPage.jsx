@@ -3,329 +3,318 @@ import API from "../services/api";
 
 const UploadPage = () => {
 
+    const [pdf, setPdf] = useState(null);
 
-const [pdf, setPdf] = useState(null);
+    const [loading, setLoading] = useState(false);
 
-const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState("");
 
-const [message, setMessage] = useState("");
+    const [progress, setProgress] = useState(0);
 
-const [progress, setProgress] = useState(0);
+    const [pages, setPages] = useState(0);
 
-const [pages, setPages] = useState(0);
+    const [embeddingInfo, setEmbeddingInfo] =
+        useState(null);
 
-const [embeddingInfo, setEmbeddingInfo] =
-    useState(null);
+    const [query, setQuery] =
+        useState("");
 
-const [query, setQuery] =
-    useState("");
+    const [messages, setMessages] =
+        useState([]);
 
-const [results, setResults] =
-    useState([]);
+    const [loadingAnswer,
+        setLoadingAnswer] =
+        useState(false);
 
-const [answer, setAnswer] = useState("");
+    // -------------------------
+    // Upload PDF
+    // -------------------------
 
+    const handleUpload = async () => {
 
-const handleUpload = async () => {
+        if (!pdf) {
 
-    if (!pdf) {
-
-        setMessage("Please select a PDF");
-
-        return;
-    }
-
-    try {
-
-        setLoading(true);
-
-        setMessage("");
-
-        setProgress(0);
-
-        const formData = new FormData();
-
-        formData.append("pdf", pdf);
-
-        const response = await API.post(
-            "/upload",
-            formData,
-            {
-                headers: {
-                    "Content-Type":
-                        "multipart/form-data",
-                },
-
-                onUploadProgress:
-                    (progressEvent) => {
-
-                        const percent =
-                            Math.round(
-                                (
-                                    progressEvent.loaded * 100
-                                ) /
-                                progressEvent.total
-                            );
-
-                        setProgress(percent);
-                    },
-            }
-        );
-
-        setMessage(response.data.message);
-
-        setPages(response.data.pages);
-
-        setEmbeddingInfo(
-            response.data.sampleEmbedding
-        );
-
-    } catch (error) {
-
-        console.log(error);
-
-        setMessage("Upload failed");
-
-    } finally {
-
-        setLoading(false);
-    }
-};
-
-
-const handleSearch = async () => {
-
-    try {
-
-        const response =
-            await API.post(
-                "/search",
-                {
-                    query,
-                }
+            setMessage(
+                "Please select a PDF"
             );
 
-        setAnswer(
-    response.data.answer
-);
+            return;
+        }
 
-setResults(
-    response.data.sources
-);
+        try {
 
-    } catch (error) {
+            setLoading(true);
 
-        console.log(error);
-    }
-};
+            setMessage("");
 
+            setProgress(0);
 
-return (
+            const formData =
+                new FormData();
 
-    <div className="min-h-screen bg-gray-100 p-10">
+            formData.append(
+                "pdf",
+                pdf
+            );
 
-        <div className="bg-white p-10 rounded-2xl shadow-lg max-w-5xl mx-auto">
+            const response =
+                await API.post(
+                    "/upload",
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type":
+                                "multipart/form-data",
+                        },
 
-            <h1 className="text-4xl font-bold text-center mb-6">
-                OpsMind AI
-            </h1>
+                        onUploadProgress:
+                            (
+                                progressEvent
+                            ) => {
 
-            <p className="text-gray-600 text-center mb-8">
-                Upload SOP PDF documents
-            </p>
+                                const percent =
+                                    Math.round(
+                                        (
+                                            progressEvent.loaded *
+                                            100
+                                        ) /
+                                        progressEvent.total
+                                    );
 
-            <input
-                type="file"
-                accept=".pdf"
-                onChange={(e) =>
-                    setPdf(e.target.files[0])
-                }
-                className="w-full border p-3 rounded-lg"
-            />
+                                setProgress(
+                                    percent
+                                );
+                            },
+                    }
+                );
 
-            <button
-                onClick={handleUpload}
-                disabled={loading}
-                className="w-full mt-5 bg-black text-white py-3 rounded-lg hover:bg-gray-800"
-            >
-                {
-                    loading
-                        ? "Uploading..."
-                        : "Upload PDF"
-                }
-            </button>
+            setMessage(
+                response.data.message
+            );
 
-            {
-                progress > 0 && (
+            setPages(
+                response.data.pages
+            );
 
-                    <div className="mt-4">
+            setEmbeddingInfo(
+                response.data.sampleEmbedding
+            );
 
-                        <div className="w-full bg-gray-300 rounded-full h-4">
+        } catch (error) {
 
-                            <div
-                                className="bg-black h-4 rounded-full"
-                                style={{
-                                    width:
-                                        `${progress}%`,
-                                }}
-                            />
+            console.log(error);
 
-                        </div>
+            setMessage(
+                "Upload failed"
+            );
 
-                        <p className="text-center mt-2">
-                            {progress}%
-                        </p>
+        } finally {
 
-                    </div>
-                )
-            }
+            setLoading(false);
+        }
+    };
 
-            {
-                message && (
+    // -------------------------
+    // Ask Question
+    // -------------------------
 
-                    <p className="text-center mt-4 font-medium">
-                        {message}
-                    </p>
-                )
-            }
+    const handleSearch = async () => {
 
-            {
-                pages > 0 && (
+        if (!query.trim())
+            return;
 
-                    <p className="mt-4 text-center">
-                        Total Pages: {pages}
-                    </p>
-                )
-            }
+        const userMessage = {
 
-            {
-                embeddingInfo && (
+            role: "user",
 
-                    <div className="mt-8 bg-gray-100 p-5 rounded-xl">
+            content: query,
+        };
 
-                        <h2 className="text-2xl font-bold mb-4">
-                            Sample Embedding
-                        </h2>
+        setMessages(
+            (prev) => [
+                ...prev,
+                userMessage,
+            ]
+        );
 
-                        <p>
-                            <strong>Chunk:</strong>
-                            {" "}
-                            {embeddingInfo.chunkIndex}
-                        </p>
+        setLoadingAnswer(
+            true
+        );
 
-                        <p>
-                            <strong>Character Count:</strong>
-                            {" "}
-                            {embeddingInfo.charCount}
-                        </p>
+        try {
 
-                        <p>
-                            <strong>
-                                Embedding Dimensions:
-                            </strong>
-                            {" "}
-                            {
-                                embeddingInfo.embedding?.length
-                            }
-                        </p>
+            const response =
+                await API.post(
+                    "/search",
+                    {
+                        query,
+                    }
+                );
 
-                    </div>
-                )
-            }
+            const botMessage = {
 
-            <div className="mt-10">
+                role:
+                    "assistant",
 
-                <h2 className="text-2xl font-bold mb-4">
-                    Ask Questions
-                </h2>
+                content:
+                    response.data
+                        .answer,
+
+                sources:
+                    response.data
+                        .sources ||
+                    [],
+            };
+
+            setMessages(
+                (prev) => [
+                    ...prev,
+                    botMessage,
+                ]
+            );
+
+            setQuery("");
+
+        } catch (error) {
+
+            console.log(error);
+
+            const errorMessage = {
+
+                role:
+                    "assistant",
+
+                content:
+                    "Search failed. Please try again.",
+
+                sources: [],
+            };
+
+            setMessages(
+                (prev) => [
+                    ...prev,
+                    errorMessage,
+                ]
+            );
+
+        } finally {
+
+            setLoadingAnswer(
+                false
+            );
+        }
+    };
+
+    return (
+
+        <div className="min-h-screen bg-gray-100 p-10">
+
+            <div className="bg-white p-10 rounded-2xl shadow-lg max-w-6xl mx-auto">
+
+                {/* Header */}
+
+                <h1 className="text-5xl font-bold text-center mb-6">
+                    OpsMind AI
+                </h1>
+
+                <p className="text-gray-600 text-center mb-8">
+                    Upload SOP PDF documents
+                </p>
+
+                {/* Upload Section */}
 
                 <input
-                    type="text"
-                    value={query}
+                    type="file"
+                    accept=".pdf"
                     onChange={(e) =>
-                        setQuery(
-                            e.target.value
+                        setPdf(
+                            e.target
+                                .files[0]
                         )
                     }
-                    placeholder="Ask about the document..."
                     className="w-full border p-3 rounded-lg"
                 />
 
                 <button
-                    onClick={handleSearch}
-                    className="w-full mt-3 bg-blue-600 text-white py-3 rounded-lg"
+                    onClick={
+                        handleUpload
+                    }
+                    disabled={
+                        loading
+                    }
+                    className="w-full mt-5 bg-black text-white py-3 rounded-lg hover:bg-gray-800"
                 >
-                    Search
+                    {
+                        loading
+                            ? "Uploading..."
+                            : "Upload PDF"
+                    }
                 </button>
 
-            </div>
+                {/* Progress */}
 
-            {
-    answer && (
+                {
+                    progress > 0 && (
 
-        <div className="mt-8">
+                        <div className="mt-5">
 
-            <h2 className="text-2xl font-bold mb-4">
-                Answer
-            </h2>
+                            <div className="w-full bg-gray-300 h-4 rounded-full">
 
-            <div className="bg-green-100 p-5 rounded-lg">
+                                <div
+                                    className="bg-black h-4 rounded-full"
+                                    style={{
+                                        width:
+                                            `${progress}%`,
+                                    }}
+                                />
 
-                <p className="whitespace-pre-wrap">
-                    {answer}
-                </p>
+                            </div>
 
-            </div>
-
-        </div>
-    )
-}
-
-
-{
-    results.length > 0 && (
-
-        <div className="mt-10">
-
-            <h2 className="text-2xl font-bold mb-4">
-                Sources
-            </h2>
-
-            {
-                results.map(
-                    (
-                        item,
-                        index
-                    ) => (
-
-                        <div
-                            key={index}
-                            className="bg-gray-100 p-4 rounded-lg mb-4"
-                        >
-
-                            <p>
-                                <strong>
-                                    File:
-                                </strong>
-                                {" "}
+                            <p className="text-center mt-2">
                                 {
-                                    item.fileName ||
-                                    "Unknown"
+                                    progress
                                 }
+                                %
                             </p>
 
-                            <p>
-                                <strong>
-                                    Page:
-                                </strong>
-                                {" "}
-                                {
-                                    item.pageNumber ||
-                                    "N/A"
-                                }
-                            </p>
+                        </div>
+                    )
+                }
 
-                                
+                {/* Upload Status */}
+
+                {
+                    message && (
+
+                        <p className="text-center mt-4 font-medium">
+                            {
+                                message
+                            }
+                        </p>
+                    )
+                }
+
+                {
+                    pages > 0 && (
+
+                        <p className="text-center mt-2">
+                            Total Pages:
+                            {" "}
+                            {pages}
+                        </p>
+                    )
+                }
+
+                {/* Embedding Info */}
+
+                {
+                    embeddingInfo && (
+
+                        <div className="mt-8 bg-gray-100 p-5 rounded-xl">
+
+                            <h2 className="text-2xl font-bold mb-4">
+                                Sample Embedding
+                            </h2>
 
                             <p>
                                 <strong>
@@ -333,35 +322,209 @@ return (
                                 </strong>
                                 {" "}
                                 {
-                                    item.chunk
+                                    embeddingInfo.chunkIndex
                                 }
                             </p>
 
                             <p>
                                 <strong>
-                                    Score:
+                                    Character Count:
                                 </strong>
                                 {" "}
                                 {
-                                    item.score?.toFixed(4)
+                                    embeddingInfo.charCount
+                                }
+                            </p>
+
+                            <p>
+                                <strong>
+                                    Embedding Dimensions:
+                                </strong>
+                                {" "}
+                                {
+                                    embeddingInfo.embedding
+                                        ?.length
                                 }
                             </p>
 
                         </div>
                     )
-                )
-            }
+                }
+
+                {/* Chat Section */}
+
+                <div className="mt-10">
+
+                    <h2 className="text-3xl font-bold mb-5">
+                        Chat with SOP
+                    </h2>
+
+                    <div className="bg-gray-50 border rounded-xl h-[500px] overflow-y-auto p-5">
+
+                        {
+                            messages.map(
+                                (
+                                    msg,
+                                    index
+                                ) => (
+
+                                    <div
+                                        key={
+                                            index
+                                        }
+                                        className={`mb-6 flex ${
+                                            msg.role ===
+                                            "user"
+                                                ? "justify-end"
+                                                : "justify-start"
+                                        }`}
+                                    >
+
+                                        <div
+                                            className={`max-w-[75%] p-4 rounded-xl ${
+                                                msg.role ===
+                                                "user"
+                                                    ? "bg-blue-600 text-white"
+                                                    : "bg-green-100 text-black"
+                                            }`}
+                                        >
+
+                                            <p className="whitespace-pre-wrap">
+                                                {
+                                                    msg.content
+                                                }
+                                            </p>
+
+                                            {
+                                                msg.sources
+                                                    ?.length >
+                                                    0 && (
+
+                                                    <div className="mt-4 border-t pt-3 text-sm">
+
+                                                        <strong>
+                                                            Sources
+                                                        </strong>
+
+                                                        {
+                                                            msg.sources.map(
+                                                                (
+                                                                    src,
+                                                                    i
+                                                                ) => (
+
+                                                                    <div
+                                                                        key={
+                                                                            i
+                                                                        }
+                                                                        className="mt-2"
+                                                                    >
+
+                                                                        <p>
+                                                                            File:
+                                                                            {" "}
+                                                                            {
+                                                                                src.fileName
+                                                                            }
+                                                                        </p>
+
+                                                                        <p>
+                                                                            Page:
+                                                                            {" "}
+                                                                            {
+                                                                                src.pageNumber
+                                                                            }
+                                                                        </p>
+
+                                                                        <p>
+                                                                            Chunk:
+                                                                            {" "}
+                                                                            {
+                                                                                src.chunk
+                                                                            }
+                                                                        </p>
+
+                                                                        <p>
+                                                                            Score:
+                                                                            {" "}
+                                                                            {
+                                                                                src.score?.toFixed(
+                                                                                    4
+                                                                                )
+                                                                            }
+                                                                        </p>
+
+                                                                    </div>
+                                                                )
+                                                            )
+                                                        }
+
+                                                    </div>
+                                                )
+                                            }
+
+                                        </div>
+
+                                    </div>
+                                )
+                            )
+                        }
+
+                        {
+                            loadingAnswer && (
+
+                                <div className="flex justify-start">
+
+                                    <div className="bg-gray-200 p-4 rounded-xl">
+
+                                        Thinking...
+
+                                    </div>
+
+                                </div>
+                            )
+                        }
+
+                    </div>
+
+                    {/* Input */}
+
+                    <div className="flex gap-3 mt-5">
+
+                        <input
+                            type="text"
+                            value={
+                                query
+                            }
+                            onChange={(
+                                e
+                            ) =>
+                                setQuery(
+                                    e.target
+                                        .value
+                                )
+                            }
+                            placeholder="Ask a question about the SOP..."
+                            className="flex-1 border p-3 rounded-lg"
+                        />
+
+                        <button
+                            onClick={
+                                handleSearch
+                            }
+                            className="bg-blue-600 text-white px-8 rounded-lg"
+                        >
+                            Send
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
-    )
-}
-
-        </div>
-
-    </div>
-);
-
-
+    );
 };
 
 export default UploadPage;
