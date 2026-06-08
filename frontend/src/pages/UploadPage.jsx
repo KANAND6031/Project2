@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect,useRef } from "react";
 import API from "../services/api";
 
 const UploadPage = () => {
@@ -25,6 +25,18 @@ const UploadPage = () => {
     const [loadingAnswer,
         setLoadingAnswer] =
         useState(false);
+
+    const chatEndRef =
+    useRef(null);
+
+useEffect(() => {
+
+    chatEndRef.current
+        ?.scrollIntoView({
+            behavior: "smooth"
+        });
+
+}, [messages]);
 
     // -------------------------
     // Upload PDF
@@ -484,6 +496,7 @@ const UploadPage = () => {
                                 </div>
                             )
                         }
+                        <div ref={chatEndRef}></div>
 
                     </div>
 
@@ -496,14 +509,14 @@ const UploadPage = () => {
                             value={
                                 query
                             }
-                            onChange={(
-                                e
-                            ) =>
-                                setQuery(
-                                    e.target
-                                        .value
-                                )
+                            onChange={(e) =>
+                                setQuery(e.target.value)
                             }
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    handleSearch();
+                                }
+                        }}
                             placeholder="Ask a question about the SOP..."
                             className="flex-1 border p-3 rounded-lg"
                         />
