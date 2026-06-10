@@ -447,6 +447,12 @@ useEffect(() => {
                                                                                 src.pageNumber
                                                                             }
                                                                         </p>
+                                                                        <p>
+                                                                            <strong>
+                                                                            Section:
+                                                                            </strong>{" "}
+                                                                            {src.section}
+                                                                        </p>
 
                                                                         <p>
                                                                             Chunk:

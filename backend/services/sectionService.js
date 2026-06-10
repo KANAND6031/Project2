@@ -1,16 +1,64 @@
-function extractSection(text){
+function extractSection(text) {
 
-    const lines =
-        text.split("\n");
+    const sectionPatterns = [
 
-    for(const line of lines){
+        "Document Control",
+        "Executive Summary",
+        "Operational Philosophy",
+        "Facility Classifications",
+        "Governance & Auditing",
 
-        if(
-            line.length > 5 &&
-            line.length < 100
-        ){
+        "Inbound Operations",
+        "Trailer Docking",
+        "Unloading & Decanting",
+        "Product Preparation",
+        "Stow Operations",
 
-            return line.trim();
+        "Inventory Audit Framework",
+        "Simple Bin Count",
+        "Cycle Count",
+        "Damaged Inventory",
+        "Bin Consolidation",
+
+        "Outbound Operations",
+        "Picking Strategies",
+        "Pack Operations",
+        "SLAM Operations",
+        "Ship Dock Logistics",
+
+        "Delivery Station",
+        "Route Planning",
+        "Driver Load-Out",
+        "Delivery Protocols",
+
+        "Customer Service",
+        "Ticket Lifecycle",
+        "Refunds & Returns",
+        "Fraud Prevention",
+
+        "Safety",
+        "PPE",
+        "Shift Handover",
+
+        "Business Continuity",
+        "Evacuation",
+        "WMS Outages",
+        "Hazmat Response",
+        "Extreme Weather"
+    ];
+
+    for (
+        const section of
+        sectionPatterns
+    ) {
+
+        if (
+            text.includes(
+                section
+            )
+        ) {
+
+            return section;
         }
     }
 

@@ -126,12 +126,33 @@ router.post(
                     req.file.originalname,
             });
 
-            // temporary fix....
-            await Chunk.deleteMany({});
 
             // Store in MongoDB
             await Chunk.insertMany(
-                embeddedChunks
+                embeddedChunks.map(
+(chunk) => ({
+
+    fileName:
+        req.file.originalname,
+
+    pageNumber:
+        chunk.pageNumber,
+
+    section:
+        chunk.section,
+
+    chunkIndex:
+        chunk.chunkIndex,
+
+    text:
+        chunk.text,
+
+    charCount:
+        chunk.charCount,
+
+    embedding:
+        chunk.embedding
+}))
             );
 
             console.log(
@@ -146,7 +167,7 @@ router.post(
                     "Chunks stored successfully",
 
                 pages:
-                    pdfData.pages,
+                    pdfData.totalPages,
 
                 totalChunks:
                     embeddedChunks.length,

@@ -2,50 +2,57 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-const connectDB = require("./config/db");
+const connectDB =
+    require("./config/db");
 
-const testRoutes = require("./routes/testRoutes");
-const uploadRoutes = require("./routes/uploadRoutes");
-const adminRoutes =require("./routes/adminRoutes");
+const testRoutes =
+    require("./routes/testRoutes");
+
+const uploadRoutes =
+    require("./routes/uploadRoutes");
+
+const searchRoutes =
+    require("./routes/searchRoutes");
+
+const adminRoutes =
+    require("./routes/adminRoutes");
 
 const app = express();
+
+
+// Connect MongoDB
+connectDB();
+
+
+// Middleware
+
 app.use(
     cors({
         origin: true,
         credentials: true,
+        methods: [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE"
+        ],
     })
 );
 
-connectDB();
-
-
-// VERY IMPORTANT CORS FIX
-app.use(cors({
-    origin: [
-        "https://friendly-fortnight-4j69wqgx7ggphqqp4-5173.app.github.dev"
-    ],
-    methods: ["GET", "POST"],
-    credentials: true,
-}));
-
-
 app.use(express.json());
 
-app.use("/api", testRoutes);
-app.use("/api", uploadRoutes);
 
-app.get("/", (req, res) => {
-    res.send("OpsMind AI Backend Running");
-});
+// Routes
 
-const PORT = process.env.PORT || 5000;
+app.use(
+    "/api",
+    testRoutes
+);
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
-
-const searchRoutes =
-    require("./routes/searchRoutes");
+app.use(
+    "/api",
+    uploadRoutes
+);
 
 app.use(
     "/api",
@@ -55,4 +62,33 @@ app.use(
 app.use(
     "/api/admin",
     adminRoutes
+);
+
+
+// Health Check
+
+app.get(
+    "/",
+    (req, res) => {
+
+        res.send(
+            "OpsMind AI Backend Running"
+        );
+    }
+);
+
+
+// Server Start
+
+const PORT =
+    process.env.PORT || 5000;
+
+app.listen(
+    PORT,
+    () => {
+
+        console.log(
+            `Server running on port ${PORT}`
+        );
+    }
 );

@@ -12,6 +12,10 @@ function AdminPage() {
         setFiles] =
         useState([]);
 
+    const [loading,
+        setLoading] =
+        useState(true);
+
     useEffect(() => {
 
         fetchFiles();
@@ -21,125 +25,231 @@ function AdminPage() {
     const fetchFiles =
         async () => {
 
-            const res =
-                await API.get(
-                    "/admin/files"
+            try {
+
+                const res =
+                    await API.get(
+                        "/admin/files"
+                    );
+
+                setFiles(
+                    res.data
                 );
 
-            setFiles(
-                res.data
-            );
+            } catch (error) {
+
+                console.log(error);
+
+            } finally {
+
+                setLoading(
+                    false
+                );
+            }
         };
+
 
     const deleteFile =
         async (fileName) => {
 
+            const confirmDelete =
+                window.confirm(
+                    `Delete ${fileName}?`
+                );
+
             if (
-                !window.confirm(
-                    "Delete SOP?"
-                )
+                !confirmDelete
             ) {
                 return;
             }
 
-            await API.delete(
-                `/admin/file/${fileName}`
-            );
+            try {
 
-            fetchFiles();
+                await API.delete(
+                    `/admin/file/${fileName}`
+                );
+
+                fetchFiles();
+
+            } catch (error) {
+
+                console.log(error);
+            }
         };
+
+
+    const reindexFile =
+        async (fileName) => {
+
+            try {
+
+                const res =
+                    await API.post(
+                        `/admin/reindex/${fileName}`
+                    );
+
+                alert(
+                    res.data.message
+                );
+
+            } catch (error) {
+
+                console.log(error);
+            }
+        };
+
 
     return (
 
-        <div className="p-10">
+        <div className="min-h-screen bg-gray-100 p-10">
 
-            <h1 className="text-4xl font-bold mb-6">
+            <div className="bg-white p-8 rounded-xl shadow-lg">
 
-                Knowledge Base
+                <h1 className="text-4xl font-bold mb-6">
 
-            </h1>
+                    SOP Management Dashboard
 
-            <table className="w-full border">
+                </h1>
 
-                <thead>
+                <div className="mb-6">
 
-                    <tr>
+                    <h2 className="text-xl font-semibold">
 
-                        <th>File</th>
+                        Total SOPs:
+                        {" "}
+                        {files.length}
 
-                        <th>Pages</th>
+                    </h2>
 
-                        <th>Chunks</th>
+                </div>
 
-                        <th>Actions</th>
+                {
+                    loading ? (
 
-                    </tr>
+                        <p>
+                            Loading...
+                        </p>
 
-                </thead>
+                    ) : (
 
-                <tbody>
+                        <table className="w-full border">
 
-                    {
-                        files.map(
-                            (file) => (
+                            <thead>
 
-                                <tr
-                                    key={
-                                        file._id
-                                    }
-                                >
+                                <tr className="bg-gray-200">
 
-                                    <td>
-                                        {
-                                            file._id
-                                        }
-                                    </td>
+                                    <th className="p-3 border">
+                                        File Name
+                                    </th>
 
-                                    <td>
-                                        {
-                                            file.pages
-                                        }
-                                    </td>
+                                    <th className="p-3 border">
+                                        Pages
+                                    </th>
 
-                                    <td>
-                                        {
-                                            file.chunks
-                                        }
-                                    </td>
+                                    <th className="p-3 border">
+                                        Chunks
+                                    </th>
 
-                                    <td>
-
-                                        <button
-
-                                            onClick={() =>
-                                                deleteFile(
-                                                    file._id
-                                                )
-                                            }
-
-                                            className="
-                                            bg-red-500
-                                            text-white
-                                            px-3
-                                            py-1
-                                            rounded
-                                            "
-                                        >
-
-                                            Delete
-
-                                        </button>
-
-                                    </td>
+                                    <th className="p-3 border">
+                                        Actions
+                                    </th>
 
                                 </tr>
-                            )
-                        )
-                    }
 
-                </tbody>
+                            </thead>
 
-            </table>
+                            <tbody>
+
+                                {
+                                    files.map(
+                                        (
+                                            file,
+                                            index
+                                        ) => (
+
+                                            <tr
+                                                key={
+                                                    index
+                                                }
+                                            >
+
+                                                <td className="border p-3">
+                                                    {
+                                                        file.fileName
+                                                    }
+                                                </td>
+
+                                                <td className="border p-3">
+                                                    {
+                                                        file.pages
+                                                    }
+                                                </td>
+
+                                                <td className="border p-3">
+                                                    {
+                                                        file.chunks
+                                                    }
+                                                </td>
+
+                                                <td className="border p-3">
+
+                                                    <button
+
+                                                        onClick={() =>
+                                                            reindexFile(
+                                                                file.fileName
+                                                            )
+                                                        }
+
+                                                        className="
+                                                        bg-blue-500
+                                                        text-white
+                                                        px-3
+                                                        py-1
+                                                        rounded
+                                                        mr-2
+                                                        "
+                                                    >
+
+                                                        Reindex
+
+                                                    </button>
+
+                                                    <button
+
+                                                        onClick={() =>
+                                                            deleteFile(
+                                                                file.fileName
+                                                            )
+                                                        }
+
+                                                        className="
+                                                        bg-red-500
+                                                        text-white
+                                                        px-3
+                                                        py-1
+                                                        rounded
+                                                        "
+                                                    >
+
+                                                        Delete
+
+                                                    </button>
+
+                                                </td>
+
+                                            </tr>
+                                        )
+                                    )
+                                }
+
+                            </tbody>
+
+                        </table>
+                    )
+                }
+
+            </div>
 
         </div>
     );
