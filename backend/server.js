@@ -6,6 +6,7 @@ const connectDB = require("./config/db");
 
 const testRoutes = require("./routes/testRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
+const adminRoutes =require("./routes/adminRoutes");
 
 const app = express();
 app.use(
@@ -49,4 +50,9 @@ const searchRoutes =
 app.use(
     "/api",
     searchRoutes
+);
+
+app.use(
+    "/api/admin",
+    adminRoutes
 );

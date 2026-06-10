@@ -4,9 +4,10 @@ const router = express.Router();
 const Chunk =
 require("../models/Chunk");
 
+// Get all uploaded files
+
 router.get(
     "/files",
-
     async (req, res) => {
 
         try {
@@ -42,23 +43,21 @@ router.get(
     }
 );
 
+// Delete file
+
 router.delete(
     "/file/:fileName",
-
     async (req, res) => {
 
         try {
 
             await Chunk.deleteMany({
-
                 fileName:
                     req.params.fileName
             });
 
             res.json({
-
                 success: true,
-
                 message:
                     "File deleted"
             });
@@ -73,20 +72,4 @@ router.delete(
     }
 );
 
-router.post(
-    "/reindex/:fileName",
-
-    async (req, res) => {
-
-        res.json({
-
-            success: true,
-
-            message:
-                "Re-index functionality placeholder"
-        });
-    }
-);
-
-module.exports =
-router;
+module.exports = router;
