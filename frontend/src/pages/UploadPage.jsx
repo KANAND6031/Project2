@@ -408,78 +408,67 @@ useEffect(() => {
                                             </p>
 
                                             {
-                                                msg.sources
-                                                    ?.length >
-                                                    0 && (
+    msg.content !==
+    "I don't know based on uploaded SOPs."
 
-                                                    <div className="mt-4 border-t pt-3 text-sm">
+    &&
 
-                                                        <strong>
-                                                            Sources
-                                                        </strong>
+    msg.sources?.length > 0
 
-                                                        {
-                                                            msg.sources.map(
-                                                                (
-                                                                    src,
-                                                                    i
-                                                                ) => (
+    && (
 
-                                                                    <div
-                                                                        key={
-                                                                            i
-                                                                        }
-                                                                        className="mt-2"
-                                                                    >
+        <div className="mt-4 border-t pt-3 text-sm">
 
-                                                                        <p>
-                                                                            File:
-                                                                            {" "}
-                                                                            {
-                                                                                src.fileName
-                                                                            }
-                                                                        </p>
+            <strong>
+                Sources
+            </strong>
 
-                                                                        <p>
-                                                                            Page:
-                                                                            {" "}
-                                                                            {
-                                                                                src.pageNumber
-                                                                            }
-                                                                        </p>
-                                                                        <p>
-                                                                            <strong>
-                                                                            Section:
-                                                                            </strong>{" "}
-                                                                            {src.section}
-                                                                        </p>
+            {
+                msg.sources.map(
+                    (
+                        src,
+                        i
+                    ) => (
 
-                                                                        <p>
-                                                                            Chunk:
-                                                                            {" "}
-                                                                            {
-                                                                                src.chunk
-                                                                            }
-                                                                        </p>
+                        <div
+                            key={i}
+                            className="mt-2"
+                        >
 
-                                                                        <p>
-                                                                            Score:
-                                                                            {" "}
-                                                                            {
-                                                                                src.score?.toFixed(
-                                                                                    4
-                                                                                )
-                                                                            }
-                                                                        </p>
+                            <p>
+                                File: {src.fileName}
+                            </p>
 
-                                                                    </div>
-                                                                )
-                                                            )
-                                                        }
+                            <p>
+                                Page: {src.pageNumber}
+                            </p>
 
-                                                    </div>
-                                                )
-                                            }
+                            <p>
+                                <strong>
+                                    Section:
+                                </strong>{" "}
+                                {src.section}
+                            </p>
+
+                            <p>
+                                Chunk: {src.chunk}
+                            </p>
+
+                            <p>
+                                Score:{" "}
+                                {src.score?.toFixed(
+                                    4
+                                )}
+                            </p>
+
+                        </div>
+                    )
+                )
+            }
+
+        </div>
+    )
+}
 
                                         </div>
 
