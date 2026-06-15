@@ -94,6 +94,21 @@ router.post(
                         },
                     },
                 ]);
+                const bestScore =
+    results[0]?.score || 0;
+
+if (bestScore < 0.65) {
+
+    return res.status(200).json({
+
+        success: true,
+
+        answer:
+            "I don't know based on uploaded SOPs.",
+
+        sources: []
+    });
+}
 
             // No matching chunks
             if (
@@ -136,6 +151,22 @@ ${chunk.text}`
                 await generateAnswer(
                     prompt
                 );
+
+                if (
+    !answer ||
+    answer.trim().length === 0
+) {
+
+    return res.status(200).json({
+
+        success: true,
+
+        answer:
+            "I don't know based on uploaded SOPs.",
+
+        sources: []
+    });
+}
 
             res.status(200).json({
 
