@@ -219,22 +219,77 @@ useEffect(() => {
 
     return (
 
-        <div className="min-h-screen bg-gray-100 p-10">
+        <div className="
+min-h-screen
+bg-gradient-to-br
+from-slate-50
+via-blue-50
+to-indigo-100
+p-6
+md:p-10
+">
 
-            <div className="bg-white p-10 rounded-2xl shadow-lg max-w-6xl mx-auto">
+            <div className="
+bg-white
+p-10
+rounded-3xl
+shadow-2xl
+max-w-7xl
+mx-auto
+border
+border-gray-200
+">
 
                 {/* Header */}
 
-                <h1 className="text-5xl font-bold text-center mb-6">
-                    OpsMind AI
-                </h1>
+                <div className="text-center mb-10">
 
-                <p className="text-gray-600 text-center mb-8">
-                    Upload SOP PDF documents
-                </p>
+    <h1 className="
+    text-6xl
+    font-extrabold
+    bg-gradient-to-r
+    from-blue-600
+    to-indigo-700
+    bg-clip-text
+    text-transparent
+    ">
+        OpsMind AI
+    </h1>
+
+    <p className="
+    text-gray-600
+    mt-3
+    text-lg
+    ">
+        Enterprise SOP Knowledge Assistant
+    </p>
+
+    <div className="
+    inline-flex
+    items-center
+    gap-2
+    bg-green-100
+    text-green-700
+    px-4
+    py-2
+    rounded-full
+    font-medium
+    mt-4
+    ">
+        ● AI Powered RAG System
+    </div>
+
+</div>
 
                 {/* Upload Section */}
-
+                <div className="
+bg-white
+rounded-2xl
+shadow-xl
+p-8
+mb-8
+border
+">
                 <input
                     type="file"
                     accept=".pdf"
@@ -254,7 +309,21 @@ useEffect(() => {
                     disabled={
                         loading
                     }
-                    className="w-full mt-5 bg-black text-white py-3 rounded-lg hover:bg-gray-800"
+                    className="
+w-full
+mt-5
+bg-gradient-to-r
+from-blue-600
+to-indigo-700
+text-white
+py-4
+rounded-xl
+font-semibold
+shadow-lg
+hover:scale-[1.01]
+transition
+duration-300
+"
                 >
                     {
                         loading
@@ -262,7 +331,7 @@ useEffect(() => {
                             : "Upload PDF"
                     }
                 </button>
-
+                </div>
                 {/* Progress */}
 
                 {
@@ -273,7 +342,15 @@ useEffect(() => {
                             <div className="w-full bg-gray-300 h-4 rounded-full">
 
                                 <div
-                                    className="bg-black h-4 rounded-full"
+                                    className="
+bg-gradient-to-r
+from-blue-500
+to-indigo-600
+h-4
+rounded-full
+transition-all
+duration-500
+"
                                     style={{
                                         width:
                                             `${progress}%`,
@@ -319,49 +396,60 @@ useEffect(() => {
 
                 {/* Embedding Info */}
 
-                {
-                    embeddingInfo && (
+                <div className="
+grid
+grid-cols-1
+md:grid-cols-3
+gap-4
+mt-8
+">
 
-                        <div className="mt-8 bg-gray-100 p-5 rounded-xl">
+<div className="
+bg-white
+shadow-lg
+rounded-xl
+p-5
+text-center
+">
+<h3 className="font-bold">
+Pages
+</h3>
+<p className="text-3xl">
+{pages}
+</p>
+</div>
 
-                            <h2 className="text-2xl font-bold mb-4">
-                                Sample Embedding
-                            </h2>
+<div className="
+bg-white
+shadow-lg
+rounded-xl
+p-5
+text-center
+">
+<h3 className="font-bold">
+Chunk Size
+</h3>
+<p className="text-3xl">
+1000
+</p>
+</div>
 
-                            <p>
-                                <strong>
-                                    Chunk:
-                                </strong>
-                                {" "}
-                                {
-                                    embeddingInfo.chunkIndex
-                                }
-                            </p>
+<div className="
+bg-white
+shadow-lg
+rounded-xl
+p-5
+text-center
+">
+<h3 className="font-bold">
+Embedding Dimensions
+</h3>
+<p className="text-3xl">
+384
+</p>
+</div>
 
-                            <p>
-                                <strong>
-                                    Character Count:
-                                </strong>
-                                {" "}
-                                {
-                                    embeddingInfo.charCount
-                                }
-                            </p>
-
-                            <p>
-                                <strong>
-                                    Embedding Dimensions:
-                                </strong>
-                                {" "}
-                                {
-                                    embeddingInfo.embedding
-                                        ?.length
-                                }
-                            </p>
-
-                        </div>
-                    )
-                }
+</div>
 
                 {/* Chat Section */}
 
@@ -371,7 +459,15 @@ useEffect(() => {
                         Chat with SOP
                     </h2>
 
-                    <div className="bg-gray-50 border rounded-xl h-[500px] overflow-y-auto p-5">
+                    <div className="
+bg-white
+border
+rounded-2xl
+shadow-xl
+h-[600px]
+overflow-y-auto
+p-6
+">
 
                         {
                             messages.map(
@@ -396,8 +492,8 @@ useEffect(() => {
                                             className={`max-w-[75%] p-4 rounded-xl ${
                                                 msg.role ===
                                                 "user"
-                                                    ? "bg-blue-600 text-white"
-                                                    : "bg-green-100 text-black"
+                                                    ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg"
+                                                    : "bg-white border shadow-md text-black"
                                             }`}
                                         >
 
@@ -432,7 +528,13 @@ useEffect(() => {
 
                         <div
                             key={i}
-                            className="mt-2"
+                            className="
+mt-3
+bg-gray-50
+p-3
+rounded-lg
+border
+"
                         >
 
                             <p>
@@ -480,15 +582,30 @@ useEffect(() => {
                         {
                             loadingAnswer && (
 
-                                <div className="flex justify-start">
+                                <div className="flex gap-2">
 
-                                    <div className="bg-gray-200 p-4 rounded-xl">
+<div className="
+w-3 h-3
+bg-blue-500
+rounded-full
+animate-bounce
+"></div>
 
-                                        Thinking...
+<div className="
+w-3 h-3
+bg-blue-500
+rounded-full
+animate-bounce
+"></div>
 
-                                    </div>
+<div className="
+w-3 h-3
+bg-blue-500
+rounded-full
+animate-bounce
+"></div>
 
-                                </div>
+</div>
                             )
                         }
                         <div ref={chatEndRef}></div>
@@ -513,14 +630,35 @@ useEffect(() => {
                                 }
                         }}
                             placeholder="Ask a question about the SOP..."
-                            className="flex-1 border p-3 rounded-lg"
+                            className="
+flex-1
+border
+border-gray-300
+p-4
+rounded-xl
+shadow-sm
+focus:ring-2
+focus:ring-blue-500
+focus:outline-none
+"
                         />
 
                         <button
                             onClick={
                                 handleSearch
                             }
-                            className="bg-blue-600 text-white px-8 rounded-lg"
+                            className="
+bg-gradient-to-r
+from-blue-600
+to-indigo-700
+text-white
+px-8
+rounded-xl
+shadow-lg
+hover:scale-105
+transition
+duration-300
+"
                         >
                             Send
                         </button>
