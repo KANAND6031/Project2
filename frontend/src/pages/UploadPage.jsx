@@ -1,3 +1,9 @@
+import Navbar
+from "../components/Navbar";
+
+import StatsBar
+from "../components/StatsBar";
+
 import { useState,useEffect,useRef } from "react";
 import API from "../services/api";
 
@@ -12,6 +18,10 @@ const UploadPage = () => {
     const [progress, setProgress] = useState(0);
 
     const [pages, setPages] = useState(0);
+
+    const [totalChunks,
+    setTotalChunks] =
+    useState(0);
 
     const [embeddingInfo, setEmbeddingInfo] =
         useState(null);
@@ -106,6 +116,10 @@ useEffect(() => {
 
             setPages(
                 response.data.pages
+            );
+
+            setTotalChunks(
+                response.data.totalChunks || 0
             );
 
             setEmbeddingInfo(
@@ -239,6 +253,7 @@ mx-auto
 border
 border-gray-200
 ">
+    <Navbar />
 
                 {/* Header */}
 
@@ -290,6 +305,15 @@ p-8
 mb-8
 border
 ">
+                <h2 className="
+text-2xl
+font-bold
+mb-4
+text-gray-800
+">
+📄 Upload SOP Document
+</h2>
+
                 <input
                     type="file"
                     accept=".pdf"
@@ -396,67 +420,21 @@ duration-500
 
                 {/* Embedding Info */}
 
-                <div className="
-grid
-grid-cols-1
-md:grid-cols-3
-gap-4
-mt-8
-">
-
-<div className="
-bg-white
-shadow-lg
-rounded-xl
-p-5
-text-center
-">
-<h3 className="font-bold">
-Pages
-</h3>
-<p className="text-3xl">
-{pages}
-</p>
-</div>
-
-<div className="
-bg-white
-shadow-lg
-rounded-xl
-p-5
-text-center
-">
-<h3 className="font-bold">
-Chunk Size
-</h3>
-<p className="text-3xl">
-1000
-</p>
-</div>
-
-<div className="
-bg-white
-shadow-lg
-rounded-xl
-p-5
-text-center
-">
-<h3 className="font-bold">
-Embedding Dimensions
-</h3>
-<p className="text-3xl">
-384
-</p>
-</div>
-
-</div>
+<StatsBar
+    pages={pages}
+    chunks={totalChunks}
+    dimensions={
+        embeddingInfo?.embedding
+            ?.length || 384
+    }
+/>
 
                 {/* Chat Section */}
 
                 <div className="mt-10">
 
-                    <h2 className="text-3xl font-bold mb-5">
-                        Chat with SOP
+                    <h2 className="text-3xl font-bold mb-5 flex items-center gap-2">
+                        🤖 AI Knowledge Assistant
                     </h2>
 
                     <div className="
@@ -468,6 +446,25 @@ h-[600px]
 overflow-y-auto
 p-6
 ">
+
+{
+messages.length === 0 && (
+
+<div className="
+flex
+items-center
+justify-center
+h-full
+text-gray-400
+text-lg
+">
+
+Ask a question about your uploaded SOP
+
+</div>
+
+)
+}
 
                         {
                             messages.map(
@@ -515,9 +512,13 @@ p-6
 
         <div className="mt-4 border-t pt-3 text-sm">
 
-            <strong>
-                Sources
-            </strong>
+            <h4 className="
+font-bold
+text-blue-600
+mb-2
+">
+Sources
+</h4>
 
             {
                 msg.sources.map(
