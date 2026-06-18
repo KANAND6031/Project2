@@ -46,32 +46,17 @@ function Dashboard() {
                 "
             >
 
-                {
-                    activeTab ===
-                    "chat"
+                <div className={activeTab === "chat" ? "block" : "hidden"}>
+    <ChatSection />
+</div>
 
-                    &&
+<div className={activeTab === "upload" ? "block" : "hidden"}>
+    <UploadSection />
+</div>
 
-                    <ChatSection />
-                }
-
-                {
-                    activeTab ===
-                    "upload"
-
-                    &&
-
-                    <UploadSection />
-                }
-
-                {
-                    activeTab ===
-                    "admin"
-
-                    &&
-
-                    <AdminPage />
-                }
+<div className={activeTab === "admin" ? "block" : "hidden"}>
+    <AdminPage />
+</div>
 
             </div>
 
