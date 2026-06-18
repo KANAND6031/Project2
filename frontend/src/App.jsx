@@ -1,17 +1,22 @@
-import AdminPage from "./pages/AdminPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import UploadPage from "./pages/UploadPage";
-import ChatPage from "./pages/ChatPage";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
+
     return (
+
         <BrowserRouter>
+
             <Routes>
-                <Route path="/" element={<UploadPage />} />
-                <Route path="/chat" element={<ChatPage />} />
-                <Route path="/admin" element={<AdminPage />}/>
+
+                <Route
+                    path="/"
+                    element={<Dashboard />}
+                />
+
             </Routes>
+
         </BrowserRouter>
     );
 }
