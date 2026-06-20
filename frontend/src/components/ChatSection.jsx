@@ -1,94 +1,103 @@
 import { useState, useEffect, useRef } from "react";
 import API from "../services/api";
-
+import PDFModal from "./PDFModal";
 function ChatSection() {
 
+    const [selectedSource, setSelectedSource] = useState(null);
+    const [query, setQuery] = useState("");
 
-const [query, setQuery] = useState("");
+    const [messages, setMessages] = useState([]);
 
-const [messages, setMessages] = useState([]);
+    const [loadingAnswer, setLoadingAnswer] =
+        useState(false);
 
-const [loadingAnswer, setLoadingAnswer] =
-    useState(false);
+    const chatEndRef = useRef(null);
 
-const chatEndRef = useRef(null);
+    useEffect(() => {
 
-useEffect(() => {
+        chatEndRef.current?.scrollIntoView({
+            behavior: "smooth"
+        });
 
-    chatEndRef.current?.scrollIntoView({
-        behavior: "smooth"
-    });
+    }, [messages]);
 
-}, [messages]);
+    const openCitation =
+        (source) => {
 
-const handleSearch = async () => {
-
-    if (!query.trim()) return;
-
-    const userMessage = {
-        role: "user",
-        content: query,
-    };
-
-    setMessages(prev => [
-        ...prev,
-        userMessage
-    ]);
-
-    setLoadingAnswer(true);
-
-    try {
-
-        const response =
-            await API.post(
-                "/search",
-                {
-                    query
-                }
+            setSelectedSource(
+                source
             );
 
-        const botMessage = {
-            role: "assistant",
-            content:
-                response.data.answer,
-            sources:
-                response.data.sources || []
+        };
+
+    const handleSearch = async () => {
+
+        if (!query.trim()) return;
+
+        const userMessage = {
+            role: "user",
+            content: query,
         };
 
         setMessages(prev => [
             ...prev,
-            botMessage
+            userMessage
         ]);
 
-        setQuery("");
+        setLoadingAnswer(true);
 
-    } catch (error) {
+        try {
 
-        console.log(error);
+            const response =
+                await API.post(
+                    "/search",
+                    {
+                        query
+                    }
+                );
 
-        const errorMessage = {
-            role: "assistant",
-            content:
-                "Search failed. Please try again.",
-            sources: []
-        };
+            const botMessage = {
+                role: "assistant",
+                content:
+                    response.data.answer,
+                sources:
+                    response.data.sources || []
+            };
 
-        setMessages(prev => [
-            ...prev,
-            errorMessage
-        ]);
+            setMessages(prev => [
+                ...prev,
+                botMessage
+            ]);
 
-    } finally {
+            setQuery("");
 
-        setLoadingAnswer(false);
-    }
-};
+        } catch (error) {
 
-return (
+            console.log(error);
 
-    <div className="p-6">
+            const errorMessage = {
+                role: "assistant",
+                content:
+                    "Search failed. Please try again.",
+                sources: []
+            };
 
-        <h2 className="
+            setMessages(prev => [
+                ...prev,
+                errorMessage
+            ]);
+
+        } finally {
+
+            setLoadingAnswer(false);
+        }
+    };
+
+    return (
+
+        <div className="p-6">
+
+            <h2 className="
         text-3xl
         font-bold
         mb-5
@@ -96,10 +105,10 @@ return (
         items-center
         gap-2
         ">
-            🤖 AI Knowledge Assistant
-        </h2>
+                🤖 AI Knowledge Assistant
+            </h2>
 
-        <div className="
+            <div className="
         bg-white
         border
         rounded-2xl
@@ -109,10 +118,10 @@ return (
         p-6
         ">
 
-            {
-                messages.length === 0 && (
+                {
+                    messages.length === 0 && (
 
-                    <div className="
+                        <div className="
                     flex
                     items-center
                     justify-center
@@ -121,195 +130,204 @@ return (
                     text-lg
                     ">
 
-                        Ask a question about your uploaded SOP
+                            Ask a question about your uploaded SOP
 
-                    </div>
-                )
-            }
+                        </div>
+                    )
+                }
 
-            {
-                messages.map(
-                    (
-                        msg,
-                        index
-                    ) => (
-
-                        <div
-                            key={index}
-                            className={`mb-6 flex ${
-                                msg.role === "user"
-                                    ? "justify-end"
-                                    : "justify-start"
-                            }`}
-                        >
+                {
+                    messages.map(
+                        (
+                            msg,
+                            index
+                        ) => (
 
                             <div
-                                className={`max-w-[75%] p-4 rounded-xl ${
-                                    msg.role === "user"
-                                        ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg"
-                                        : "bg-white border shadow-md text-black"
-                                }`}
+                                key={index}
+                                className={`mb-6 flex ${msg.role === "user"
+                                    ? "justify-end"
+                                    : "justify-start"
+                                    }`}
                             >
 
-                                <p className="whitespace-pre-wrap">
-                                    {msg.content}
-                                </p>
+                                <div
+                                    className={`max-w-[75%] p-4 rounded-xl ${msg.role === "user"
+                                        ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg"
+                                        : "bg-white border shadow-md text-black"
+                                        }`}
+                                >
 
-                                {
-                                    msg.content !==
-                                    "I don't know based on uploaded SOPs."
+                                    <p className="whitespace-pre-wrap">
+                                        {msg.content}
+                                    </p>
 
-                                    &&
+                                    {
+                                        msg.content !==
+                                        "I don't know based on uploaded SOPs."
 
-                                    msg.sources?.length > 0
+                                        &&
 
-                                    && (
+                                        msg.sources?.length > 0
 
-                                        <div className="
+                                        && (
+
+                                            <div className="
                                         mt-4
                                         border-t
                                         pt-3
                                         text-sm
                                         ">
 
-                                            <h4 className="
+                                                <h4 className="
                                             font-bold
                                             text-blue-600
                                             mb-2
                                             ">
-                                                Sources
-                                            </h4>
+                                                    Sources
+                                                </h4>
 
-                                            {
-                                                msg.sources.map(
-                                                    (
-                                                        src,
-                                                        i
-                                                    ) => (
+                                                {
+                                                    msg.sources.map(
+                                                        (
+                                                            src,
+                                                            i
+                                                        ) => (
 
-                                                        <div
-                                                            key={i}
-                                                            className="
+                                                            <div
+                                                                key={i}
+                                                                className="
                                                             mt-3
                                                             bg-gray-50
                                                             p-3
                                                             rounded-lg
                                                             border
                                                             "
-                                                        >
+                                                            >
 
-                                                            <p>
-                                                                File:
-                                                                {" "}
-                                                                {src.fileName}
-                                                            </p>
+                                                                <p>
+                                                                    File:
+                                                                    {" "}
+                                                                    {src.fileName}
+                                                                </p>
 
-                                                            <p>
-                                                                Page:
-                                                                {" "}
-                                                                {src.pageNumber}
-                                                            </p>
+                                                                <button
 
-                                                            <p>
-                                                                <strong>
-                                                                    Section:
-                                                                </strong>
-                                                                {" "}
-                                                                {src.section}
-                                                            </p>
+                                                                    onClick={() =>
+                                                                        openCitation(
+                                                                            src
+                                                                        )
+                                                                    }
 
-                                                            <p>
-                                                                Chunk:
-                                                                {" "}
-                                                                {src.chunk}
-                                                            </p>
+                                                                    className="text-blue-600 underline font-medium"
+                                                                >
 
-                                                            <p>
-                                                                Score:
-                                                                {" "}
-                                                                {src.score?.toFixed(4)}
-                                                            </p>
 
-                                                        </div>
+                                                                    Page
+                                                                    {src.pageNumber}
+
+                                                                </button>
+
+                                                                <p>
+                                                                    <strong>
+                                                                        Section:
+                                                                    </strong>
+                                                                    {" "}
+                                                                    {src.section}
+                                                                </p>
+
+                                                                <p>
+                                                                    Chunk:
+                                                                    {" "}
+                                                                    {src.chunk}
+                                                                </p>
+
+                                                                <p>
+                                                                    Score:
+                                                                    {" "}
+                                                                    {src.score?.toFixed(4)}
+                                                                </p>
+
+                                                            </div>
+                                                        )
                                                     )
-                                                )
-                                            }
+                                                }
 
-                                        </div>
-                                    )
-                                }
+                                            </div>
+                                        )
+                                    }
+
+                                </div>
 
                             </div>
+                        )
+                    )
+                }
+
+                {
+                    loadingAnswer && (
+
+                        <div className="flex gap-2">
+
+                            <div className="
+                        w-3
+                        h-3
+                        bg-blue-500
+                        rounded-full
+                        animate-bounce
+                        "></div>
+
+                            <div className="
+                        w-3
+                        h-3
+                        bg-blue-500
+                        rounded-full
+                        animate-bounce
+                        "></div>
+
+                            <div className="
+                        w-3
+                        h-3
+                        bg-blue-500
+                        rounded-full
+                        animate-bounce
+                        "></div>
 
                         </div>
                     )
-                )
-            }
+                }
 
-            {
-                loadingAnswer && (
+                <div ref={chatEndRef}></div>
 
-                    <div className="flex gap-2">
+            </div>
 
-                        <div className="
-                        w-3
-                        h-3
-                        bg-blue-500
-                        rounded-full
-                        animate-bounce
-                        "></div>
-
-                        <div className="
-                        w-3
-                        h-3
-                        bg-blue-500
-                        rounded-full
-                        animate-bounce
-                        "></div>
-
-                        <div className="
-                        w-3
-                        h-3
-                        bg-blue-500
-                        rounded-full
-                        animate-bounce
-                        "></div>
-
-                    </div>
-                )
-            }
-
-            <div ref={chatEndRef}></div>
-
-        </div>
-
-        <div className="
+            <div className="
         flex
         gap-3
         mt-5
         ">
 
-            <input
-                type="text"
-                value={query}
-                onChange={(e) =>
-                    setQuery(
-                        e.target.value
-                    )
-                }
-                onKeyDown={(e) => {
-
-                    if (
-                        e.key === "Enter"
-                    ) {
-
-                        handleSearch();
+                <input
+                    type="text"
+                    value={query}
+                    onChange={(e) =>
+                        setQuery(
+                            e.target.value
+                        )
                     }
-                }}
-                placeholder="
+                    onKeyDown={(e) => {
+
+                        if (
+                            e.key === "Enter"
+                        ) {
+
+                            handleSearch();
+                        }
+                    }}
+                    placeholder="
                 Ask a question about the SOP...
                 "
-                className="
+                    className="
                 flex-1
                 border
                 border-gray-300
@@ -320,13 +338,13 @@ return (
                 focus:ring-blue-500
                 focus:outline-none
                 "
-            />
+                />
 
-            <button
-                onClick={
-                    handleSearch
-                }
-                className="
+                <button
+                    onClick={
+                        handleSearch
+                    }
+                    className="
                 bg-gradient-to-r
                 from-blue-600
                 to-indigo-700
@@ -338,14 +356,35 @@ return (
                 transition
                 duration-300
                 "
-            >
-                Send
-            </button>
+                >
+                    Send
+                </button>
+
+            </div>
+
+{
+selectedSource && (
+
+<PDFModal
+    page={
+        selectedSource.pageNumber
+    }
+    snippet={
+        selectedSource.snippet
+    }
+    section={
+        selectedSource.section
+    }
+    onClose={() =>
+        setSelectedSource(null)
+    }
+/>
+
+)
+}
 
         </div>
-
-    </div>
-);
+    );
 
 
 }

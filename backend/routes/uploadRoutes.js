@@ -98,6 +98,9 @@ router.post(
                     fileName:
                         req.file.originalname,
 
+                    pdfPath:
+                        req.file.filename,
+
                     pageNumber:
                         chunk.pageNumber,
 
@@ -134,6 +137,9 @@ router.post(
 
     fileName:
         req.file.originalname,
+
+    pdfPath:
+        chunk.pdfPath,
 
     pageNumber:
         chunk.pageNumber,

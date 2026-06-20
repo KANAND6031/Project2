@@ -5,6 +5,8 @@ new mongoose.Schema({
 
     fileName: String,
 
+    pdfPath: String,
+
     pageNumber: Number,
 
     section: String,

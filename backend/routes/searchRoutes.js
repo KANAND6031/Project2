@@ -79,6 +79,8 @@ router.post(
 
                             fileName: 1,
 
+                            pdfPath: 1,
+
                             pageNumber: 1,
 
                             section: 1,
@@ -183,11 +185,17 @@ ${chunk.text}`
                             fileName:
                                 item.fileName,
 
+                            pdfPath:
+                                item.pdfPath,
+
                             pageNumber:
                                 item.pageNumber,
 
                             section:
                                 item.section,
+
+                            snippet:
+                                item.text,
 
                             chunk:
                                 item.chunkIndex,
