@@ -153,8 +153,8 @@ function ChatSection() {
 
                                 <div
                                     className={`max-w-[75%] p-4 rounded-xl ${msg.role === "user"
-                                        ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg"
-                                        : "bg-white border shadow-md text-black"
+                                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl"
+                                        : "bg-gradient-to-r from-slate-50 to-blue-50 border shadow-md"
                                         }`}
                                 >
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Sidebar
 from "../components/Sidebar";
@@ -20,6 +20,34 @@ function Dashboard() {
     ] =
     useState("chat");
 
+    const [darkMode, setDarkMode] =
+    useState(localStorage.getItem("theme")=== "dark");
+
+    useEffect(() => {
+
+        if (darkMode) {
+
+            document.documentElement
+                .classList.add("dark");
+
+            localStorage.setItem(
+                "theme",
+                "dark"
+            );
+
+        } else {
+
+            document.documentElement
+                .classList.remove("dark");
+
+            localStorage.setItem(
+                "theme",
+                "light"
+            );
+        }
+
+    }, [darkMode]);
+
     return (
 
         <div
@@ -30,19 +58,17 @@ function Dashboard() {
         >
 
             <Sidebar
-                activeTab={
-                    activeTab
-                }
-                setActiveTab={
-                    setActiveTab
-                }
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                darkMode={darkMode}
+                setDarkMode={setDarkMode}
             />
 
             <div
                 className="
                 flex-1
                 p-6
-                bg-slate-100
+                bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100
                 "
             >
 

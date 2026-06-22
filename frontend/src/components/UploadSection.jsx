@@ -128,13 +128,13 @@ function UploadSection() {
             border-gray-200
             ">
 
-                <h1 className="
-                text-4xl
-                font-bold
-                mb-6
-                ">
-                    📄 Upload SOP
+                <h1 className="text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    OpsMind AI
                 </h1>
+
+                <p className="text-gray-500 mt-3 text-lg">
+                    Enterprise SOP Intelligence Platform
+                </p>
 
                 <div className="
                 bg-white
@@ -192,9 +192,23 @@ function UploadSection() {
                     >
 
                         {
-                            loading
-                                ? "Uploading..."
-                                : "Upload PDF"
+                            loading ? (
+
+                                <div className="flex items-center justify-center gap-2">
+
+                                    <div className="w-3 h-3 bg-white rounded-full animate-bounce"></div>
+
+                                    <div className="w-3 h-3 bg-white rounded-full animate-bounce"></div>
+
+                                    <div className="w-3 h-3 bg-white rounded-full animate-bounce"></div>
+
+                                </div>
+
+                            ) : (
+
+                                "Upload PDF"
+
+                            )
                         }
 
                     </button>

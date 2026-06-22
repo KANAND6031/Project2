@@ -1,6 +1,8 @@
 const Sidebar = ({
     activeTab,
-    setActiveTab
+    setActiveTab,
+    darkMode,
+    setDarkMode
 }) => {
 
     const menuItems = [
@@ -40,6 +42,7 @@ const Sidebar = ({
             >
                 OpsMind AI
             </h1>
+            
 
             {
                 menuItems.map(
@@ -52,20 +55,12 @@ const Sidebar = ({
                                     item.id
                                 )
                             }
-                            className={`
-                            p-4
-                            rounded-xl
-                            mb-3
-                            text-left
+                            className={`group flex items-center gap-3 w-full p-4 rounded-xl transition-all duration-300 cursor-pointer
 
-                            ${
-                                activeTab ===
-                                item.id
-
-                                ? "bg-indigo-600"
-
-                                : "hover:bg-slate-800"
-                            }
+                                ${activeTab === item.id
+                                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl"
+                                    : "hover:bg-indigo-600 hover:translate-x-2 hover:shadow-lg"
+                                }
                             `}
                         >
                             {item.label}
@@ -75,7 +70,7 @@ const Sidebar = ({
             }
 
             <div className="mt-auto">
-
+                
                 <div
                     className="
                     bg-green-900
