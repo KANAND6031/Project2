@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-    baseURL: "https://friendly-fortnight-4j69wqgx7ggphqqp4-5000.app.github.dev/api",
+    baseURL: "https://opsmind-backend-ujiv.onrender.com/api",
 });
 
 export default API;
