@@ -84,14 +84,6 @@ Displays:
 
 ---
 
-### 🌙 Dark Mode
-
-* Light Theme
-* Dark Theme
-* Persistent theme preference
-
----
-
 ### 🛠 Admin Dashboard
 
 Admin users can:
@@ -183,7 +175,7 @@ Project2
 
 ---
 
-# 🚀 Installation
+# Installation
 
 ## Clone Repository
 
